@@ -1,2 +1,2 @@
 Project-Name: swimmingdsl
-Source: src/ast,src/lexer,src/main,src/semantics,src/syntax
+Source: src/ast,src/lexer,src/main,src/semantics,src/syntaxis

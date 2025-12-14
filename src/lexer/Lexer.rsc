@@ -1,6 +1,13 @@
 module lexer::Lexer
 import IO;
-int main(){
-    println("ya por fin");
-    return 1;
-}
+
+
+layout WS = [\t-\n\r\ ]*;                    
+lexical INT = [0-9]+;
+lexical ID  = [a-zA-Z][a-zA-Z0-9_]*;           
+lexical SWIM = "swim";
+lexical KICK = "kick";
+lexical PACE = "pace";
+lexical REST = "rest";
+lexical X = "x";
+
