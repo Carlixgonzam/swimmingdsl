@@ -3,21 +3,21 @@ module SwimSyntax
 extend Lexer;
 
 start syntax Program
-  = program: Session+;
+  = Session+;
 
 syntax Session
-  = session: "session" ID "{" Block+ "}";
+  = "session" ID "{" Block+ "}";
 
 syntax Block
-  = single: Set
-  | interval: INT "x" Set Rest?;
+  = Set
+  | INT "x" Set Rest?;
 
 syntax Set
-  = swim: "swim" INT "m" Pace?
-  | kick: "kick" INT "m";
+  = "swim" INT "m" Pace?
+  | "kick" INT "m";
 
 syntax Pace
-  = pace: "pace" INT;
+  = "pace" INT;
 
 syntax Rest
-  = rest: "rest" INT "s";
+  = "rest" INT "s";
