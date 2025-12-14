@@ -1,7 +1,7 @@
 module Visitors
+
 import AST;
 import Semantics;
-
 
 int totalDistance(Program p) {
   int total = 0;
