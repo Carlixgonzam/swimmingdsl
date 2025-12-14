@@ -1,5 +1,4 @@
 module ast::AST
-import syntaxis::SwimSyntax;
 import ParseTree;
 import String;
 import List;
@@ -11,7 +10,7 @@ data Session
   = Session(str name, list[Block] blocks);
 
 data Block
-  = Single(Set seti)
+  = SingleSet(Set seti)
   | Interval(int reps, Set seti, Rest rest);
 
 data Set
@@ -37,7 +36,7 @@ list[Block] toAST(list[Block] blocks) =
   [toAST(b) | b <- blocks];
 
 Block toAST((Block) `<Set seti>`) =
-  Single(toAST(seti));
+  SingleSet(toAST(seti));
 
 Block toAST((Block) `<INT reps> x <Set seti> <Rest? rest>`) {
   int r = toInt(reps.symbol);

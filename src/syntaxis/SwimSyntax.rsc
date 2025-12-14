@@ -1,22 +1,23 @@
 module syntaxis::SwimSyntax
+
 import lexer::Lexer;
 
 syntax Program
-  = program: Session+;
+  = Session+;
 
 syntax Session
-  = session: SWIM ID "{" Block+ "}"; 
+  = SESSION ID "{" Block+ "}"; 
 
 syntax Block
-  = single: Set
-  | interval: INT X Set Rest?;
+  = Set
+  | INT X Set Rest?;
 
 syntax Set
-  = swim: SWIM INT "m" Pace?
-  | kick: KICK INT "m";
+  = SWIM INT "m" Pace?
+  | KICK INT "m";
 
 syntax Pace
-  = pace: PACE INT;
+  = PACE INT;
 
 syntax Rest
-  = rest: REST INT "s";
+  = REST INT "s";

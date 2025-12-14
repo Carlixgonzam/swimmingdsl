@@ -10,4 +10,7 @@ lexical KICK = "kick";
 lexical PACE = "pace";
 lexical REST = "rest";
 lexical X = "x";
+lexical SESSION = "session";
+
+
 

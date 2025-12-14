@@ -11,7 +11,7 @@ int distance(Set s) {
 
 int blockDistance(Block b) {
   switch(b) {
-    case Single(s): return distance(s);
+    case SingleSet(s): return distance(s);
     case Interval(r, s, _): return r * distance(s);
   }
 }
