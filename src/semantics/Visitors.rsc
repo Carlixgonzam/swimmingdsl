@@ -1,6 +1,6 @@
-module semantics::Visitors
-import ast::AST;
-import semantics::Semantics;
+module Visitors
+import AST;
+import Semantics;
 
 
 int totalDistance(Program p) {

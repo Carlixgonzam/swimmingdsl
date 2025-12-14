@@ -1,5 +1,5 @@
-module semantics::TypeChecker
-import ast::AST;
+module TypeChecker
+import AST;
 
 
 bool wellTyped(Block b) {

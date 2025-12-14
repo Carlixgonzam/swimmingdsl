@@ -2,9 +2,7 @@ module Main
 
 import IO;
 import ParseTree;
-import ast::AST;
-import syntaxis::SwimSyntax;
-import semantics::Visitors;
+import SwimSyntax;
 
 void main(list[str] args) {
   if (size(args) != 1) {
@@ -12,13 +10,9 @@ void main(list[str] args) {
     return;
   }
 
-  str inputProgram = readFile(args[0]);
+  str input = readFile(args[0]);
 
-  Tree pt = parse(#Program, inputProgram);
-  Program ast = toAST(pt);
+  parse(#Program, input);
 
-  println("Program parsed successfully");
-
-  int total = totalDistance(ast);
-  println("Total distance: <total> meters");
+  println("Parsed successfully");
 }

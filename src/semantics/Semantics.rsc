@@ -1,5 +1,5 @@
-module semantics::Semantics
-import ast::AST;
+module Semantics
+import AST;
 
 
 int distance(Set s) {

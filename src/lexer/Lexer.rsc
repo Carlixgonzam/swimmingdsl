@@ -1,4 +1,4 @@
-module lexer::Lexer
+module Lexer
 import IO;
 
 

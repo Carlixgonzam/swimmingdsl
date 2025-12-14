@@ -1,6 +1,6 @@
-module syntaxis::SwimSyntax
+module SwimSyntax
 
-import lexer::Lexer;
+import Lexer;
 
 syntax Program
   = Session+;

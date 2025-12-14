@@ -1,4 +1,4 @@
-module ast::AST
+module AST
 import ParseTree;
 import String;
 import List;
