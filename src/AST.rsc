@@ -2,44 +2,31 @@ module AST
 
 import ParseTree;
 import String;
+data Program = program(list[Session] sessions);
 
-data Program = Program(list[Session] sessions);
-data Session = Session(str name, list[Block] blocks);
+data Session = session(str name, list[Block] blocks);
+
 data Block
-  = Single(Set s)
-  | Interval(int reps, Set s, Rest rest)
-  | Interval(int reps, Set s);
-data Set
-  = Swim(int meters, Pace pace)
-  | Swim(int meters)
-  | Kick(int meters);
-data Pace = Pace(int seconds);
-data Rest = Rest(int seconds);
+  = exercise(Exercise ex)
+  | interval(int reps, Exercise ex, int restSeconds)
+  | interval(int reps, Exercise ex);
 
-Program buildAST(Tree parseTree) {
-  list[Session] sessions = [];
-  
-  visit(parseTree) {
-    case Tree t: {
-      str treeStr = "<t>";
-      
-      if (/session/ := treeStr) {
-        try {
-          sessions += extractSession(t);
-        } catch: ; 
-      }
-    }
-  }
-  
-  return Program(sessions);
-}
+data Exercise
+  = swim(int meters, list[Modifier] modifiers)
+  | kick(int meters, list[Modifier] modifiers);
 
-Session extractSession(Tree t) {
-  str content = "<t>";
-  
-  if (/<n:[a-zA-Z][a-zA-Z0-9_]*>/ := content) {
-    return Session(n, []);
-  }
-  
-  return Session("no hay jajja", []);
-}
+data Modifier
+  = style(Style s)
+  | intensity(Intensity i)
+  | pace(int seconds);
+
+data Style
+  = freestyle()
+  | backstroke()
+  | breaststroke()
+  | butterfly();
+
+data Intensity
+  = easy()
+  | moderate()
+  | hard();

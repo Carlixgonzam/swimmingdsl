@@ -6,15 +6,41 @@ start syntax Program
   = Session+;
 
 syntax Session
-  = "session" ID "{" Block+ "}";
+  = "session" ID "{" Block* "}";
+
 
 syntax Block
-  = Set
-  | INT "x" Set Rest?;
+  = Interval
+  | Exercise;
 
-syntax Set
-  = "swim" INT "m" Pace?
-  | "kick" INT "m";
+syntax Interval
+  = INT "x" Exercise Rest?;
+
+syntax Exercise
+  = SwimExercise
+  | KickExercise;
+
+syntax SwimExercise
+  = "swim" INT "m" Modifier*;
+
+syntax KickExercise
+  = "kick" INT "m" Modifier*;
+
+syntax Modifier
+  = Style
+  | Intensity
+  | Pace;
+
+syntax Style
+  = "freestyle"
+  | "backstroke"
+  | "breaststroke"
+  | "butterfly";
+
+syntax Intensity
+  = "easy"
+  | "moderate"
+  | "hard";
 
 syntax Pace
   = "pace" INT;

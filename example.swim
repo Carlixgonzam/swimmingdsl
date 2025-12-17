@@ -1,0 +1,13 @@
+session morning {
+  swim 400 m freestyle easy pace 120
+  4 x swim 100 m freestyle hard pace 90 rest 20 s
+  swim 200 m backstroke moderate pace 130
+  3 x kick 50 m hard rest 15 s
+}
+
+session evening {
+  swim 800 m freestyle easy pace 110
+  8 x swim 50 m butterfly hard pace 60 rest 30 s
+  swim 400 m breaststroke moderate
+  kick 200 m easy
+}
