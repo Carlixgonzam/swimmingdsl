@@ -2,7 +2,7 @@
 
 Un DSL (Domain-Specific Language) para programar y analizar sesiones de entrenamiento de natación, construido con Rascal MPL.
 
-## 🎯 Características
+## Características
 
 ### 1. **Sintaxis Básica**
 ```swim
@@ -90,7 +90,7 @@ session withTargets {
 }
 ```
 
-### 8. **Generador Automático de Sesiones** 🚀
+### 8. **Generador Automático de Sesiones** 
 ```swim
 generate session {
   goal: endurance
@@ -106,7 +106,7 @@ Tipos de objetivos (goals):
 - `technique` - Técnica (énfasis en drills)
 - `recovery` - Recuperación (nado fácil continuo)
 
-## 📊 Análisis Automático
+## Análisis Automático
 
 El DSL proporciona análisis detallado de tus sesiones:
 
@@ -116,36 +116,36 @@ El DSL proporciona análisis detallado de tus sesiones:
   File: simple_advanced.swim
 ═══════════════════════════════════════════════════════
 
-📋 PARSING...
+PARSING...
 ✓ Parse successful!
 
-📊 BASIC ANALYSIS:
+BASIC ANALYSIS:
 ───────────────────────────────────────────────────────
 Total sessions: 1
 Session names: morning
 
-📏 DISTANCE CALCULATION:
+DISTANCE CALCULATION:
 ───────────────────────────────────────────────────────
 Total distance: 1700 meters (1.7 km)
 
-🏊 STROKE ANALYSIS:
+STROKE ANALYSIS:
 ───────────────────────────────────────────────────────
   • freestyle: 3 set(s)
   • backstroke: 1 set(s)
 
-💪 INTENSITY ANALYSIS:
+INTENSITY ANALYSIS:
 ───────────────────────────────────────────────────────
   • easy: 3 set(s)
   • moderate: 1 set(s)
   • hard: 3 set(s)
 
-⏱️  REST ANALYSIS:
+REST ANALYSIS:
 ───────────────────────────────────────────────────────
   Total rest periods: 1
   Total rest time: 105 seconds (1:45)
   Average rest: 15 seconds
 
-⏲️  TIME ESTIMATION:
+TIME ESTIMATION:
 ───────────────────────────────────────────────────────
   Estimated swim time: 25:30
   Rest time: 1:45
@@ -156,7 +156,7 @@ Total distance: 1700 meters (1.7 km)
 ═══════════════════════════════════════════════════════
 ```
 
-## 🚀 Cómo Usar
+## Cómo Usar
 
 ### Requisitos
 - Java 11+
@@ -233,7 +233,7 @@ swimmingdsl/
 └── README.md             # Este archivo
 ```
 
-## 🎓 Ejemplos
+## Ejemplos
 
 ### Ejemplo 1: Sesión de Resistencia
 ```swim
@@ -311,7 +311,7 @@ session mixed {
 }
 ```
 
-## 🔮 Características Futuras
+## Características Futuras
 
 - [ ] Exportación a JSON/CSV
 - [ ] Visualización de gráficas
@@ -322,7 +322,7 @@ session mixed {
 - [ ] Exportación a formatos de dispositivos (TCX/FIT)
 - [ ] Historial de entrenamientos
 
-## 🤝 Contribuciones
+## Contribuciones
 
 Las contribuciones son bienvenidas! Por favor:
 1. Fork el proyecto
@@ -331,14 +331,12 @@ Las contribuciones son bienvenidas! Por favor:
 4. Push a la rama (`git push origin feature/AmazingFeature`)
 5. Abre un Pull Request
 
-## 📝 Licencia
+## Licencia
 
 Este proyecto fue creado con fines educacionales.
 
-## 👤 Autor
+## 👤 Autora
 
-**Carla González**
+**Carla González Mina**
 
 ---
-
-¡Feliz natación! 🏊‍♀️💨
