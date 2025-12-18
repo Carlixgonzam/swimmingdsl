@@ -1,0 +1,6 @@
+generate session {
+  goal: endurance
+  distance: 3000
+  styles: [freestyle, backstroke]
+  duration: 60 minutes
+}

@@ -1,0 +1,65 @@
+session advanced {
+  warmup {
+    swim 400 m freestyle easy pace 120
+    swim 200 m backstroke easy pace 130
+  }
+  
+  main {
+    8 x swim 100 m freestyle hard pace 75 rest 15 s
+    4 x swim 200 m backstroke moderate pace 110 rest 30 s
+  }
+  
+  cooldown {
+    swim 200 m easy pace 140
+    kick 100 m easy
+  }
+}
+
+session withEquipment {
+  warmup {
+    swim 300 m easy pace 120 with fins
+  }
+  
+  main {
+    swim 200 m freestyle moderate with paddles
+    kick 100 m hard with board
+    swim 150 m easy with pullbuoy
+  }
+  
+  cooldown {
+    swim 200 m easy with snorkel
+  }
+}
+
+session techniqueWork {
+  warmup {
+    swim 400 m easy pace 120
+  }
+  
+  main {
+    drill catchup 200 m easy
+    drill fingertip 200 m easy
+    4 x drill sculling 50 m easy rest 20 s
+    drill onesided 200 m moderate
+  }
+  
+  cooldown {
+    swim 200 m easy pace 130
+  }
+}
+
+session withTargets {
+  warmup {
+    swim 400 m freestyle easy pace 120
+  }
+  
+  main {
+    swim 100 m freestyle hard pace 70 target 1:10
+    4 x swim 50 m butterfly hard pace 50 target 0:40 rest 30 s
+    swim 200 m backstroke moderate pace 100 target 2:00
+  }
+  
+  cooldown {
+    swim 200 m easy
+  }
+}

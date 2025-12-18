@@ -1,0 +1,8 @@
+session morning {
+  swim 400 m freestyle easy pace 120
+  swim 200 m backstroke moderate pace 130 with fins
+  8 x swim 100 m freestyle hard pace 75 rest 15 s
+  drill catchup 200 m easy
+  kick 100 m hard with board
+  swim 100 m freestyle hard pace 70 target 1:10
+}

@@ -7,4 +7,9 @@ lexical ID  = [a-zA-Z][a-zA-Z0-9_]* !>> [a-zA-Z0-9_];
 
 keyword Keywords = "swim" | "kick" | "pace" | "rest" | "x" | "session" | "m" | "s"
                  | "freestyle" | "backstroke" | "breaststroke" | "butterfly"
-                 | "easy" | "moderate" | "hard";
+                 | "easy" | "moderate" | "hard"
+                 | "warmup" | "main" | "cooldown"
+                 | "with" | "fins" | "paddles" | "board" | "pullbuoy" | "snorkel"
+                 | "drill" | "catchup" | "onesided" | "fingertip" | "6kick" | "sculling"
+                 | "target" | "generate" | "goal" | "distance" | "styles" | "duration" | "minutes"
+                 | "endurance" | "speed" | "technique" | "recovery";

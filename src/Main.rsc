@@ -9,7 +9,7 @@ import AST;
 import Semantics;
 
 void main() {
-  analyzeFile(|project://swimmingdsl/example.swim|);
+  analyzeFile(|project://swimmingdsl/simple_advanced.swim|);
 }
 
 void analyzeFile(loc file) {
