@@ -211,7 +211,7 @@ rascal> Session s = generateSession(generatorConfig(
 rascal> println(s);
 ```
 
-## 📂 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 swimmingdsl/
@@ -335,7 +335,7 @@ Las contribuciones son bienvenidas! Por favor:
 
 Este proyecto fue creado con fines educacionales.
 
-## 👤 Autora
+## Autora
 
 **Carla González Mina**
 
