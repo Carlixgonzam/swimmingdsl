@@ -2,31 +2,42 @@ const express = require('express');
 const { exec } = require('child_process');
 const path = require('path');
 const cors = require('cors');
+const fs = require('fs');
+const os = require('os');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../web')));
-const RASCAL_JAR = path.join(__dirname, '../rascal.jar');
+const RASCAL_JAR = path.join(__dirname, '../rascal-shell-stable.jar');
 const PROJECT_PATH = path.dirname(__dirname);
 
 function executeRascal(command, args) {
   return new Promise((resolve, reject) => {
-    const cmdArgs = [command, ...args].map(arg => `"${arg.replace(/"/g, '\\"')}"`).join(' ');
+    // Build command line arguments with proper escaping
+    const allArgs = [command, ...args];
+    const escapedArgs = allArgs.map(arg => {
+      // Escape for shell: single quotes, with escaped single quotes inside
+      return `'${arg.replace(/'/g, "'\\''")}' `;
+    }).join(' ');
     
-    const rascalCmd = `java -jar "${RASCAL_JAR}" -Dfile.encoding=UTF-8`;
-    const importCmd = `import WebAPI;`;
-    const mainCmd = `main([${cmdArgs}]);`;
+    console.log('Executing Rascal command:', command, 'with', args.length, 'arg(s)');
     
-    const fullCmd = `echo '${importCmd} ${mainCmd}' | ${rascalCmd}`;
-    
-    console.log('Executing Rascal command:', command, 'with args:', args);
+    // Execute Rascal: change to src directory and run Runner module
+    // The -Dproject.root sets where Rascal looks for modules
+    const srcPath = path.join(PROJECT_PATH, 'src');
+    const fullCmd = `cd "${srcPath}" && java -Dfile.encoding=UTF-8 -Drascal.projectPath="${srcPath}" -jar "${RASCAL_JAR}" Runner.rsc ${escapedArgs} < /dev/null`;
     
     exec(fullCmd, {
-      cwd: PROJECT_PATH,
-      maxBuffer: 10 * 1024 * 1024 // 10MB buffer
+      cwd: srcPath, // Execute from src directory so Rascal can find modules
+      maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+      timeout: 30000 // 30 second timeout
     }, (error, stdout, stderr) => {
+      console.log('Rascal callback received!');
+      console.log('Error:', error);
+      console.log('Stdout length:', stdout ? stdout.length : 0);
+      console.log('Stderr length:', stderr ? stderr.length : 0);
       if (error) {
         console.error('Rascal execution error:', error);
         console.error('stderr:', stderr);
@@ -34,30 +45,47 @@ function executeRascal(command, args) {
         return;
       }
       
-      // extraigo JSON
-      const lines = stdout.split('\n');
-      let jsonLine = null;
+      // extraigo JSON - handle ANSI codes and embedded JSON
+      console.log('===== FULL RASCAL OUTPUT =====');
+      console.log(stdout);
+      console.log('===== END OUTPUT =====');
       
-      for (let i = lines.length - 1; i >= 0; i--) {
-        const line = lines[i].trim();
-        if (line.startsWith('{') || line.startsWith('[')) {
-          jsonLine = line;
-          break;
+      // Strip ANSI escape codes first
+      const cleanOutput = stdout.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
+      
+      // Find JSON object or array anywhere in the output
+      // Look for the last complete JSON object/array
+      let jsonStr = null;
+      
+      // Try to find JSON object
+      const jsonObjectMatch = cleanOutput.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g);
+      if (jsonObjectMatch) {
+        // Take the last match (most likely the result)
+        jsonStr = jsonObjectMatch[jsonObjectMatch.length - 1];
+      }
+      
+      // If no object found, try array
+      if (!jsonStr) {
+        const jsonArrayMatch = cleanOutput.match(/\[[^\[\]]*(?:\[[^\[\]]*\][^\[\]]*)*\]/g);
+        if (jsonArrayMatch) {
+          jsonStr = jsonArrayMatch[jsonArrayMatch.length - 1];
         }
       }
       
-      if (!jsonLine) {
-        console.error('No JSON found in Rascal output:', stdout);
+      if (!jsonStr) {
+        console.error('===== NO JSON FOUND =====');
+        console.error('Clean output:', cleanOutput);
+        console.error('Stderr:', stderr);
         reject(new Error('No JSON output from Rascal'));
         return;
       }
       
       try {
-        const result = JSON.parse(jsonLine);
+        const result = JSON.parse(jsonStr);
         resolve(result);
       } catch (parseError) {
         console.error('JSON parse error:', parseError);
-        console.error('Attempted to parse:', jsonLine);
+        console.error('Attempted to parse:', jsonStr);
         reject(new Error(`Failed to parse Rascal output: ${parseError.message}`));
       }
     });
@@ -137,7 +165,7 @@ function formatTime(seconds) {
 }
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../web/index.html'));
+  res.sendFile(path.join(__dirname, '../web/index-server.html'));
 });
 
 app.listen(PORT, () => {
