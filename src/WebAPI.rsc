@@ -385,11 +385,8 @@ str targetToStr(Target t) {
 
 // CLI interface
 void main(list[str] args) {
-  if (size(args) < 2) {
-    println("Usage: rascal WebAPI <command> <args...>");
-    println("Commands:");
-    println("  analyze <code>");
-    println("  generate <goal> <distance> <style1,style2,...> <duration>");
+  if (size(args) < 1) {
+    println("{\"success\":false,\"error\":\"No command provided\"}");
     return;
   }
   
