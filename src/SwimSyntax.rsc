@@ -83,7 +83,7 @@ syntax DrillType
   = "catchup"
   | "onesided"
   | "fingertip"
-  | "6kick"
+  | "sixKick"
   | "sculling";
 
 syntax Target
