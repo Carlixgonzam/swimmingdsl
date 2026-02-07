@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Swimming DSL - Web Editor (Server Mode)</title>
+  <title>Swimming DSL - web Editor (server Mode)</title>
   <style>
     :root {
       --primary: #0077be;
@@ -366,7 +366,7 @@
     <div class="container">
       <h1>
         🏊‍♀️ Swimming DSL
-        <span class="badge">Server Mode - Powered by Rascal</span>
+        <span class="badge">Server Mode - powered by Rascal</span>
       </h1>
       <p>Programa y analiza sesiones de entrenamiento de natación</p>
     </div>
@@ -470,10 +470,10 @@
   </footer>
 
   <script>
-    // API base URL - adjust if needed
+    // API base uel
     const API_BASE = window.location.origin;
 
-    // Example code snippets
+    // ejemplos de codigo
     const examples = {
       basic: `session morning {
   swim 400 m freestyle easy pace 120
@@ -530,7 +530,7 @@
 }`
     };
 
-    // Tab switching
+    // tab switching
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -540,7 +540,7 @@
       });
     });
 
-    // Load examples
+    // load examples
     document.getElementById('examples').addEventListener('change', (e) => {
       if (e.target.value && examples[e.target.value]) {
         document.getElementById('editor').value = examples[e.target.value];
@@ -566,7 +566,6 @@
       const output = document.getElementById('analysis-output');
       const analyzeBtn = document.getElementById('analyzeBtn');
 
-      // Show loading state
       analyzeBtn.disabled = true;
       output.innerHTML = `
         <div class="loading">
@@ -786,12 +785,12 @@
       try {
         const response = await fetch(`${API_BASE}/api/health`);
         const result = await response.json();
-        console.log('✅ Server connected:', result);
+        console.log('Server connected:', result);
       } catch (error) {
-        console.warn('⚠️ Server not reachable:', error.message);
+        console.warn('Server not reachable:', error.message);
         document.getElementById('analysis-output').innerHTML = `
           <div class="warning-message">
-            <strong>⚠️ Servidor no disponible</strong><br>
+            <strong>Servidor no disponible</strong><br>
             El servidor backend no está corriendo. Inicia el servidor con:<br>
             <code style="display: block; margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 4px;">
               cd server && npm install && npm start
