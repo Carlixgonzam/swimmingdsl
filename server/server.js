@@ -53,24 +53,70 @@ function executeRascal(command, args) {
       // Strip ANSI escape codes first
       const cleanOutput = stdout.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
       
-      // Find JSON object or array anywhere in the output
-      // Look for the last complete JSON object/array
+      // Find JSON object by properly matching braces (respecting strings)
       let jsonStr = null;
+      let lastValidJson = null;
+      let startIdx = 0;
       
-      // Try to find JSON object
-      const jsonObjectMatch = cleanOutput.match(/\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}/g);
-      if (jsonObjectMatch) {
-        // Take the last match (most likely the result)
-        jsonStr = jsonObjectMatch[jsonObjectMatch.length - 1];
-      }
-      
-      // If no object found, try array
-      if (!jsonStr) {
-        const jsonArrayMatch = cleanOutput.match(/\[[^\[\]]*(?:\[[^\[\]]*\][^\[\]]*)*\]/g);
-        if (jsonArrayMatch) {
-          jsonStr = jsonArrayMatch[jsonArrayMatch.length - 1];
+      while (startIdx < cleanOutput.length) {
+        const braceIdx = cleanOutput.indexOf('{', startIdx);
+        if (braceIdx === -1) break;
+        
+        // Find matching closing brace, respecting string contents
+        let depth = 0;
+        let inString = false;
+        let escaped = false;
+        let endIdx = -1;
+        
+        for (let i = braceIdx; i < cleanOutput.length; i++) {
+          const char = cleanOutput[i];
+          
+          if (escaped) {
+            escaped = false;
+            continue;
+          }
+          
+          if (char === '\\' && inString) {
+            escaped = true;
+            continue;
+          }
+          
+          if (char === '"') {
+            inString = !inString;
+            continue;
+          }
+          
+          if (!inString) {
+            if (char === '{') depth++;
+            else if (char === '}') {
+              depth--;
+              if (depth === 0) {
+                endIdx = i;
+                break;
+              }
+            }
+          }
         }
+        
+        if (endIdx !== -1) {
+          const candidate = cleanOutput.substring(braceIdx, endIdx + 1);
+          try {
+            const parsed = JSON.parse(candidate);
+            // Prefer JSON with 'success' property (our API response)
+            if (parsed.success !== undefined) {
+              lastValidJson = candidate;
+            } else if (!lastValidJson) {
+              lastValidJson = candidate;
+            }
+          } catch (e) {
+            // Not valid JSON, continue searching
+          }
+        }
+        
+        startIdx = braceIdx + 1;
       }
+      
+      jsonStr = lastValidJson;
       
       if (!jsonStr) {
         console.error('===== NO JSON FOUND =====');

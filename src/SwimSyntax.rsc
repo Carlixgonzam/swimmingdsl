@@ -38,7 +38,9 @@ syntax SwimExercise
   | "swim" INT "m" Style Intensity Equipment
   | "swim" INT "m" Style Intensity
   | "swim" INT "m" Style Pace
+  | "swim" INT "m" Intensity Pace Equipment
   | "swim" INT "m" Intensity Pace
+  | "swim" INT "m" Intensity Equipment
   | "swim" INT "m" Pace
   | "swim" INT "m";
 
