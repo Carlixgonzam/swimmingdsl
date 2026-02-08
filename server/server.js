@@ -15,24 +15,17 @@ const PROJECT_PATH = path.dirname(__dirname);
 
 function executeRascal(command, args) {
   return new Promise((resolve, reject) => {
-    // Build command line arguments with proper escaping
     const allArgs = [command, ...args];
     const escapedArgs = allArgs.map(arg => {
-      // Escape for shell: single quotes, with escaped single quotes inside
       return `'${arg.replace(/'/g, "'\\''")}' `;
     }).join(' ');
-    
-    console.log('Executing Rascal command:', command, 'with', args.length, 'arg(s)');
-    
-    // Execute Rascal: change to src directory and run Runner module
-    // The -Dproject.root sets where Rascal looks for modules
+    console.log('executing Rascal command:', command, 'with', args.length, 'arg(s)');
     const srcPath = path.join(PROJECT_PATH, 'src');
     const fullCmd = `cd "${srcPath}" && java -Dfile.encoding=UTF-8 -Drascal.projectPath="${srcPath}" -jar "${RASCAL_JAR}" Runner.rsc ${escapedArgs} < /dev/null`;
-    
     exec(fullCmd, {
-      cwd: srcPath, // Execute from src directory so Rascal can find modules
+      cwd: srcPath, //src directorio para que rascal encuentre los modulos
       maxBuffer: 10 * 1024 * 1024, // 10MB buffer
-      timeout: 30000 // 30 second timeout
+      timeout: 30000
     }, (error, stdout, stderr) => {
       console.log('Rascal callback received!');
       console.log('Error:', error);
@@ -45,15 +38,13 @@ function executeRascal(command, args) {
         return;
       }
       
-      // extraigo JSON - handle ANSI codes and embedded JSON
-      console.log('===== FULL RASCAL OUTPUT =====');
+      // extraigo JSON
+      console.log('===== RASCAL OUTPUT =====');
       console.log(stdout);
       console.log('===== END OUTPUT =====');
-      
-      // Strip ANSI escape codes first
       const cleanOutput = stdout.replace(/\x1b\[[0-9;]*[a-zA-Z]/g, '');
       
-      // Find JSON object by properly matching braces (respecting strings)
+      // econtrar JSON
       let jsonStr = null;
       let lastValidJson = null;
       let startIdx = 0;
@@ -62,12 +53,11 @@ function executeRascal(command, args) {
         const braceIdx = cleanOutput.indexOf('{', startIdx);
         if (braceIdx === -1) break;
         
-        // Find matching closing brace, respecting string contents
+        // encontrar matching closing brace
         let depth = 0;
         let inString = false;
         let escaped = false;
         let endIdx = -1;
-        
         for (let i = braceIdx; i < cleanOutput.length; i++) {
           const char = cleanOutput[i];
           
@@ -102,14 +92,13 @@ function executeRascal(command, args) {
           const candidate = cleanOutput.substring(braceIdx, endIdx + 1);
           try {
             const parsed = JSON.parse(candidate);
-            // Prefer JSON with 'success' property (our API response)
             if (parsed.success !== undefined) {
               lastValidJson = candidate;
             } else if (!lastValidJson) {
               lastValidJson = candidate;
             }
           } catch (e) {
-            // Not valid JSON, continue searching
+    
           }
         }
         
@@ -215,9 +204,9 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🏊‍♀️ Swimming DSL Server running on http://localhost:${PORT}`);
-  console.log(`📂 Project path: ${PROJECT_PATH}`);
-  console.log(`☕ Rascal JAR: ${RASCAL_JAR}`);
+  console.log(`Swimming DSL Server running on http://localhost:${PORT}`);
+  console.log(`Project path: ${PROJECT_PATH}`);
+  console.log(`Rascal JAR: ${RASCAL_JAR}`);
   console.log('\nAPI Endpoints:');
   console.log(`  GET  /api/health - Health check`);
   console.log(`  POST /api/analyze - Analyze DSL code`);
