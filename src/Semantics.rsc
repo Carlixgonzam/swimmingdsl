@@ -78,19 +78,21 @@ Session generateSession(GeneratorConfig config) {
 Session generateEnduranceSession(GeneratorConfig config) {
   int totalDist = config.distance;
   list[Style] styles = config.styles;
-  Style mainStyle = size(styles) > 0 ? styles[0] : freestyle();
+  if (size(styles) == 0) styles = [freestyle()];
   
-  // Warmup15% of total distance
+  // Warmup 15% of total distance
   int warmupDist = (totalDist * 15) / 100;
   list[Block] warmupBlocks = [
     exercise(swim(warmupDist, noStyle(), easy(), 120, noEquipment(), noTarget()))
   ];
   
-  // Main 70% of total distance - long intervals
+  // Main 70% of total distance - distribute across all styles
   int mainDist = (totalDist * 70) / 100;
-  int setDist = mainDist / 4;
+  int numStyles = size(styles);
+  int distPerStyle = mainDist / numStyles;
   list[Block] mainBlocks = [
-    interval(4, swim(setDist, mainStyle, moderate(), 100, noEquipment(), noTarget()), 30)
+    interval(2, swim(distPerStyle / 2, styles[i], moderate(), 100, noEquipment(), noTarget()), 30)
+    | i <- [0..numStyles]
   ];
   
   // Cooldown 15% of total distance
@@ -109,7 +111,7 @@ Session generateEnduranceSession(GeneratorConfig config) {
 Session generateSpeedSession(GeneratorConfig config) {
   int totalDist = config.distance;
   list[Style] styles = config.styles;
-  Style mainStyle = size(styles) > 0 ? styles[0] : freestyle();
+  if (size(styles) == 0) styles = [freestyle()];
   
   // Warmup 20% of total distance
   int warmupDist = (totalDist * 20) / 100;
@@ -117,11 +119,15 @@ Session generateSpeedSession(GeneratorConfig config) {
     exercise(swim(warmupDist, noStyle(), easy(), 120, noEquipment(), noTarget()))
   ];
   
-  // Main 60% of total distance - short fast intervals
+  // Main 60% of total distance - distribute sprints across all styles
   int mainDist = (totalDist * 60) / 100;
-  int reps = mainDist / 50;
+  int numStyles = size(styles);
+  int distPerStyle = mainDist / numStyles;
+  int repsPerStyle = distPerStyle / 50;
+  if (repsPerStyle < 1) repsPerStyle = 1;
   list[Block] mainBlocks = [
-    interval(reps, swim(50, mainStyle, hard(), 60, noEquipment(), noTarget()), 45)
+    interval(repsPerStyle, swim(50, styles[i], hard(), 60, noEquipment(), noTarget()), 45)
+    | i <- [0..numStyles]
   ];
   
   // Cooldown 20% of total distance
