@@ -143,7 +143,7 @@ app.post('/api/analyze', async (req, res) => {
     const result = await executeRascal('analyze', [code]);
     
     if (result.success && result.time) {
-      result.time.swimFormatted = formatTime(result.time.swimSeconds);
+      result.time.swimFormatted = formatTime(result.time.swimSeconds); //segundos
       result.time.restFormatted = formatTime(result.time.restSeconds);
       result.time.totalFormatted = formatTime(result.time.totalSeconds);
     }
