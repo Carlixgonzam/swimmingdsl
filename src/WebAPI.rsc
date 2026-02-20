@@ -61,9 +61,11 @@ str analyzeToJSON(str input) {
     for (/<d:[0-9]+>\s*m/ := input) {
       totalDist += toInt(d);
     }
+    // Match intervals: "N x swim D m" (swim/kick = 1 word before distance)
     for (/<reps:[0-9]+>\s*x\s*\w+\s*<d:[0-9]+>\s*m/ := input) {
       totalDist += ((toInt(reps) - 1) * toInt(d));
     }
+    
     result["totalDistance"] = totalDist;
     result["distanceKm"] = round(totalDist / 1000.0, 0.01);
     
