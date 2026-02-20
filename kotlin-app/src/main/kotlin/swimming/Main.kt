@@ -57,11 +57,11 @@ fun SwimmingDslApp() {
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    val doAnalyze: () -> Unit = {
+    val doAnalyze: (String) -> Unit = { codeToAnalyze ->
         scope.launch {
             isLoading = true
             errorMessage = null
-            val result = rascalService.analyze(code)
+            val result = rascalService.analyze(codeToAnalyze)
             analysisResult = result
             if (!result.success) {
                 errorMessage = result.error
@@ -122,7 +122,7 @@ fun SwimmingDslApp() {
             EditorPanel(
                 code = code,
                 onCodeChange = { code = it },
-                onAnalyze = doAnalyze,
+                onAnalyze = { doAnalyze(it) },
                 isLoading = isLoading,
                 modifier = Modifier.weight(1f).fillMaxHeight()
             )

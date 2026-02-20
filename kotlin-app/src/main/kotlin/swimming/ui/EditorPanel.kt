@@ -61,7 +61,7 @@ class DslSyntaxHighlight : VisualTransformation {
 fun EditorPanel(
     code: String,
     onCodeChange: (String) -> Unit,
-    onAnalyze: () -> Unit,
+    onAnalyze: (String) -> Unit,
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -135,7 +135,7 @@ fun EditorPanel(
                 0 -> EditorTab(
                     code = code,
                     onCodeChange = onCodeChange,
-                    onAnalyze = onAnalyze,
+                    onAnalyze = { onAnalyze(code) },
                     isLoading = isLoading
                 )
                 1 -> GeneratorPanel(
@@ -143,7 +143,9 @@ fun EditorPanel(
                         onCodeChange(generatedCode)
                         selectedTab = 0
                     },
-                    onAnalyze = onAnalyze,
+                    onAnalyze = { generatedCode ->
+                        onAnalyze(generatedCode)
+                    },
                     isLoading = isLoading
                 )
             }

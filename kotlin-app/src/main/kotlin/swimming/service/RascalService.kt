@@ -33,9 +33,12 @@ class RascalService {
         try {
             val output = executeRascal("analyze", listOf(code))
             val jsonStr = extractJson(output)
-                ?: return@withContext AnalysisResult(success = false, error = "No se encontró JSON en la salida de Rascal")
+            if (jsonStr == null) {
+                return@withContext AnalysisResult(success = false, error = "No se encontró JSON en la salida de Rascal")
+            }
             json.decodeFromString<AnalysisResult>(jsonStr)
         } catch (e: Exception) {
+            e.printStackTrace()
             AnalysisResult(success = false, error = e.message ?: "Error desconocido")
         }
     }
@@ -46,9 +49,12 @@ class RascalService {
                 val stylesStr = styles.joinToString(",")
                 val output = executeRascal("generate", listOf(goal, distance.toString(), stylesStr, duration.toString()))
                 val jsonStr = extractJson(output)
-                    ?: return@withContext GenerateResult(success = false, error = "No se encontró JSON en la salida de Rascal")
+                if (jsonStr == null) {
+                    return@withContext GenerateResult(success = false, error = "No se encontró JSON en la salida de Rascal")
+                }
                 json.decodeFromString<GenerateResult>(jsonStr)
             } catch (e: Exception) {
+                e.printStackTrace()
                 GenerateResult(success = false, error = e.message ?: "Error desconocido")
             }
         }
