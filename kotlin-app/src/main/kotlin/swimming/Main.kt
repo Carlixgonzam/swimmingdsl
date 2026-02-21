@@ -16,25 +16,52 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.launch
+import org.jetbrains.skia.Image
 import swimming.model.AnalysisResult
 import swimming.service.RascalService
 import swimming.ui.AnalysisPanel
 import swimming.ui.EditorPanel
 import swimming.ui.theme.*
+import java.awt.Taskbar
+import javax.imageio.ImageIO
 
-fun main() = application {
-    val state = rememberWindowState(size = DpSize(1400.dp, 900.dp))
+fun main() {
+    // Set macOS Dock icon
+    try {
+        val iconStream = object {}.javaClass.getResourceAsStream("/app_icon.png")
+        if (iconStream != null) {
+            val awtImage = ImageIO.read(iconStream)
+            if (Taskbar.isTaskbarSupported()) {
+                Taskbar.getTaskbar().iconImage = awtImage
+            }
+        }
+    } catch (_: Exception) { }
 
-    Window(
-        onCloseRequest = ::exitApplication,
-        title = "Swimming DSL - Desktop",
-        state = state
-    ) {
-        SwimmingDslApp()
+    application {
+        val state = rememberWindowState(size = DpSize(1400.dp, 900.dp))
+
+        // Window title bar icon
+        val iconPainter = remember {
+            val bytes = object {}.javaClass.getResourceAsStream("/app_icon.png")?.readBytes()
+            if (bytes != null) {
+                BitmapPainter(Image.makeFromEncoded(bytes).toComposeImageBitmap())
+            } else null
+        }
+
+        Window(
+            onCloseRequest = ::exitApplication,
+            title = "Swimming DSL - Desktop",
+            state = state,
+            icon = iconPainter
+        ) {
+            SwimmingDslApp()
+        }
     }
 }
 
