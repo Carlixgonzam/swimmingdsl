@@ -30,7 +30,6 @@ fun AnalysisPanel(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column {
-            // Card header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -39,8 +38,6 @@ fun AnalysisPanel(
             ) {
                 Text("Análisis", fontWeight = FontWeight.SemiBold, color = TextColor)
             }
-
-            // Content
             Box(modifier = Modifier.padding(20.dp)) {
                 when {
                     isLoading -> LoadingState()
@@ -106,7 +103,6 @@ private fun AnalysisContent(result: AnalysisResult) {
         modifier = Modifier.fillMaxWidth().verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Success banner
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -118,8 +114,6 @@ private fun AnalysisContent(result: AnalysisResult) {
         ) {
             Text("✓ Análisis completado con Rascal", color = SuccessColor, fontWeight = FontWeight.Medium)
         }
-
-        // Stats grid
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(15.dp)

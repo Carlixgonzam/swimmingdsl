@@ -32,7 +32,7 @@ import java.awt.Taskbar
 import javax.imageio.ImageIO
 
 fun main() {
-    // Set macOS Dock icon
+    // macOS Dock icon
     try {
         val iconStream = object {}.javaClass.getResourceAsStream("/app_icon.png")
         if (iconStream != null) {
@@ -42,18 +42,14 @@ fun main() {
             }
         }
     } catch (_: Exception) { }
-
     application {
         val state = rememberWindowState(size = DpSize(1400.dp, 900.dp))
-
-        // Window title bar icon
         val iconPainter = remember {
             val bytes = object {}.javaClass.getResourceAsStream("/app_icon.png")?.readBytes()
             if (bytes != null) {
                 BitmapPainter(Image.makeFromEncoded(bytes).toComposeImageBitmap())
             } else null
         }
-
         Window(
             onCloseRequest = ::exitApplication,
             title = "Swimming DSL - Desktop",
@@ -102,7 +98,6 @@ fun SwimmingDslApp() {
             .fillMaxSize()
             .background(Background)
     ) {
-        // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -138,8 +133,6 @@ fun SwimmingDslApp() {
                 )
             }
         }
-
-        // Main content - two panels
         Row(
             modifier = Modifier
                 .fillMaxSize()

@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.sp
 import swimming.examples.DSL_EXAMPLES
 import swimming.ui.theme.*
 
-// Keywords for syntax highlighting
+// syntax highlighting
 private val KEYWORDS = setOf("session", "warmup", "main", "cooldown", "swim", "kick", "drill", "with", "pace", "rest", "x")
 private val STYLES = setOf("freestyle", "backstroke", "breaststroke", "butterfly", "medley")
 private val INTENSITIES = setOf("easy", "moderate", "hard", "sprint")
@@ -65,7 +65,7 @@ fun EditorPanel(
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
-    var selectedTab by remember { mutableStateOf(0) } // 0 = Código, 1 = Generador
+    var selectedTab by remember { mutableStateOf(0) } // 0 = codigo, 1 = generador
     var examplesExpanded by remember { mutableStateOf(false) }
 
     Card(
@@ -75,7 +75,6 @@ fun EditorPanel(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column {
-            // Card header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -85,8 +84,6 @@ fun EditorPanel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text("Editor", fontWeight = FontWeight.SemiBold, color = TextColor)
-
-                // Example selector
                 Box {
                     OutlinedButton(
                         onClick = { examplesExpanded = true },
@@ -111,8 +108,6 @@ fun EditorPanel(
                     }
                 }
             }
-
-            // Tabs
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = CardBackground,
@@ -129,8 +124,6 @@ fun EditorPanel(
                     text = { Text("Generador") }
                 )
             }
-
-            // Tab content
             when (selectedTab) {
                 0 -> EditorTab(
                     code = code,
@@ -161,7 +154,6 @@ private fun EditorTab(
     isLoading: Boolean
 ) {
     Column(modifier = Modifier.padding(20.dp)) {
-        // Editor with syntax highlighting
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -199,8 +191,6 @@ private fun EditorTab(
         }
 
         Spacer(modifier = Modifier.height(15.dp))
-
-        // Buttons
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Button(
                 onClick = onAnalyze,
