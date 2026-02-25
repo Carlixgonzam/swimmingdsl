@@ -45,16 +45,6 @@ La aplicación de escritorio en Kotlin Compose se comunica con el backend de Ras
 
 Rascal **no** es una librería Java/Kotlin convencional. No expone clases públicas con una API que se pueda importar con `import`. Es un lenguaje interpretado: su JAR contiene el intérprete que lee archivos `.rsc` y los ejecuta.
 
-### Ejecución por línea de comandos
-
-Para ejecutar código Rascal, se invoca:
-
-```bash
-java -Drascal.projectPath=<ruta_al_src> -jar rascal-shell-stable.jar <modulo.rsc> <comando> <args...>
-```
-
-Por ejemplo, para analizar código DSL:
-
 ```bash
 java -Drascal.projectPath=/Users/.../swimmingdsl/src \
      -jar rascal-shell-stable.jar \
