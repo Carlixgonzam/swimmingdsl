@@ -1,17 +1,25 @@
 package swimming.ui
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.OffsetMapping
@@ -69,10 +77,10 @@ fun EditorPanel(
     var examplesExpanded by remember { mutableStateOf(false) }
 
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.shadow(4.dp, RoundedCornerShape(14.dp)),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = CardBackground),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column {
             Row(
@@ -83,7 +91,11 @@ fun EditorPanel(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Editor", fontWeight = FontWeight.SemiBold, color = TextColor)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("\uD83D\uDCDD", fontSize = 18.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Editor", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
+                }
                 Box {
                     OutlinedButton(
                         onClick = { examplesExpanded = true },
@@ -154,49 +166,88 @@ private fun EditorTab(
     isLoading: Boolean
 ) {
     Column(modifier = Modifier.padding(20.dp)) {
+        // Editor with line numbers
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(400.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(10.dp))
                 .background(EditorBg)
-                .border(1.dp, BorderColor, RoundedCornerShape(8.dp))
+                .border(1.dp, BorderColor.copy(alpha = 0.3f), RoundedCornerShape(10.dp))
         ) {
-            BasicTextField(
-                value = code,
-                onValueChange = onCodeChange,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(15.dp),
-                textStyle = TextStyle(
-                    fontFamily = MonospaceFont,
-                    fontSize = 14.sp,
-                    color = EditorText,
-                    lineHeight = 21.sp
-                ),
-                cursorBrush = SolidColor(EditorText),
-                visualTransformation = remember { DslSyntaxHighlight() },
-                decorationBox = { innerTextField ->
-                    if (code.isEmpty()) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                // Line numbers gutter
+                val lineCount = code.count { it == '\n' } + 1
+                val scrollState = rememberScrollState()
+                Column(
+                    modifier = Modifier
+                        .width(44.dp)
+                        .fillMaxHeight()
+                        .background(Color(0xFF252536))
+                        .padding(vertical = 15.dp)
+                        .verticalScroll(scrollState),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    for (i in 1..lineCount) {
                         Text(
-                            "Escribe tu código .swim aquí...",
-                            color = EditorText.copy(alpha = 0.4f),
+                            text = "$i",
+                            color = EditorLineNumber,
                             fontFamily = MonospaceFont,
-                            fontSize = 14.sp
+                            fontSize = 14.sp,
+                            lineHeight = 21.sp,
+                            modifier = Modifier.padding(end = 8.dp)
                         )
                     }
-                    innerTextField()
                 }
-            )
+                // Editor area
+                BasicTextField(
+                    value = code,
+                    onValueChange = onCodeChange,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(15.dp),
+                    textStyle = TextStyle(
+                        fontFamily = MonospaceFont,
+                        fontSize = 14.sp,
+                        color = EditorText,
+                        lineHeight = 21.sp
+                    ),
+                    cursorBrush = SolidColor(Secondary),
+                    visualTransformation = remember { DslSyntaxHighlight() },
+                    decorationBox = { innerTextField ->
+                        if (code.isEmpty()) {
+                            Text(
+                                "Escribe tu código .swim aquí...",
+                                color = EditorText.copy(alpha = 0.4f),
+                                fontFamily = MonospaceFont,
+                                fontSize = 14.sp
+                            )
+                        }
+                        innerTextField()
+                    }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(15.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Animated analyze button
+            val analyzeInteraction = remember { MutableInteractionSource() }
+            val analyzeHovered by analyzeInteraction.collectIsHoveredAsState()
+            val analyzeScale by animateFloatAsState(
+                targetValue = if (analyzeHovered) 1.03f else 1f,
+                animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+            )
             Button(
                 onClick = onAnalyze,
                 enabled = !isLoading && code.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
+                interactionSource = analyzeInteraction,
+                modifier = Modifier
+                    .graphicsLayer { scaleX = analyzeScale; scaleY = analyzeScale }
+                    .hoverable(analyzeInteraction)
             ) {
                 Text(if (isLoading) "Analizando..." else "▶ Analizar")
             }

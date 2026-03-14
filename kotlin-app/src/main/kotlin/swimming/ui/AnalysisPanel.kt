@@ -1,15 +1,20 @@
 package swimming.ui
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import swimming.model.AnalysisResult
@@ -24,10 +29,10 @@ fun AnalysisPanel(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        modifier = modifier.shadow(4.dp, RoundedCornerShape(14.dp)),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = CardBackground),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column {
             Box(
@@ -36,15 +41,30 @@ fun AnalysisPanel(
                     .background(Background)
                     .padding(horizontal = 20.dp, vertical = 15.dp)
             ) {
-                Text("Análisis", fontWeight = FontWeight.SemiBold, color = TextColor)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("\uD83D\uDCCA", fontSize = 18.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Análisis", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
+                }
             }
             Box(modifier = Modifier.padding(20.dp)) {
-                when {
-                    isLoading -> LoadingState()
-                    errorMessage != null -> ErrorState(errorMessage)
-                    result != null && result.success -> AnalysisContent(result)
-                    result != null && !result.success -> ErrorState(result.error ?: "Error desconocido")
-                    else -> EmptyState()
+                Crossfade(
+                    targetState = when {
+                        isLoading -> "loading"
+                        errorMessage != null -> "error"
+                        result != null && result.success -> "success"
+                        result != null && !result.success -> "error_result"
+                        else -> "empty"
+                    },
+                    animationSpec = tween(ANIM_MEDIUM)
+                ) { state ->
+                    when (state) {
+                        "loading" -> LoadingState()
+                        "error" -> ErrorState(errorMessage ?: "")
+                        "success" -> AnalysisContent(result!!)
+                        "error_result" -> ErrorState(result?.error ?: "Error desconocido")
+                        else -> EmptyState()
+                    }
                 }
             }
         }
@@ -53,13 +73,26 @@ fun AnalysisPanel(
 
 @Composable
 private fun LoadingState() {
+    val infiniteTransition = rememberInfiniteTransition()
+    val pulse by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(800, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
     Column(
         modifier = Modifier.fillMaxWidth().padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        CircularProgressIndicator(color = Primary)
-        Spacer(modifier = Modifier.height(15.dp))
-        Text("Analizando con Rascal...", color = TextLight)
+        CircularProgressIndicator(color = Primary, strokeWidth = 3.dp)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            "Analizando con Rascal...",
+            color = TextLight,
+            modifier = Modifier.graphicsLayer { alpha = pulse }
+        )
     }
 }
 
@@ -84,14 +117,18 @@ private fun ErrorState(message: String) {
 
 @Composable
 private fun EmptyState() {
-    Box(
+    Column(
         modifier = Modifier.fillMaxWidth().padding(40.dp),
-        contentAlignment = Alignment.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text("\uD83C\uDFCA", fontSize = 48.sp)
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
-            "Escribe código y presiona \"Analizar\" para ver los resultados",
+            "Escribe código y presiona \"Analizar\"\npara ver los resultados",
             color = TextLight,
-            fontSize = 14.sp
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+            lineHeight = 22.sp
         )
     }
 }
@@ -99,20 +136,29 @@ private fun EmptyState() {
 @Composable
 private fun AnalysisContent(result: AnalysisResult) {
     val scrollState = rememberScrollState()
+    // Stagger animation for children
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(result) { visible = true }
+
     Column(
         modifier = Modifier.fillMaxWidth().verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    SuccessColor.copy(alpha = 0.1f),
-                    RoundedCornerShape(8.dp)
-                )
-                .padding(15.dp)
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(tween(ANIM_MEDIUM)) + slideInVertically(tween(ANIM_MEDIUM)) { -20 }
         ) {
-            Text("✓ Análisis completado con Rascal", color = SuccessColor, fontWeight = FontWeight.Medium)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        SuccessColor.copy(alpha = 0.1f),
+                        RoundedCornerShape(10.dp)
+                    )
+                    .padding(15.dp)
+            ) {
+                Text("\u2713 Análisis completado con Rascal", color = SuccessColor, fontWeight = FontWeight.Medium)
+            }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),

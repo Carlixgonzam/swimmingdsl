@@ -1,13 +1,22 @@
 package swimming.ui.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,15 +41,25 @@ fun TagChip(
         TagType.DRILL -> TagDrillBg to TagDrillText
     }
 
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isHovered) 1.08f else 1f,
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
+    )
+
     Text(
         text = text,
         color = fg,
         fontSize = 13.sp,
-        fontWeight = FontWeight.Medium,
+        fontWeight = FontWeight.SemiBold,
         modifier = modifier
+            .graphicsLayer { scaleX = scale; scaleY = scale }
             .clip(RoundedCornerShape(20.dp))
             .background(bg)
-            .padding(horizontal = 12.dp, vertical = 5.dp)
+            .border(1.dp, if (isHovered) fg.copy(alpha = 0.3f) else bg, RoundedCornerShape(20.dp))
+            .hoverable(interactionSource)
+            .padding(horizontal = 14.dp, vertical = 6.dp)
     )
 }
 
