@@ -27,16 +27,20 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.jetbrains.skia.Image
 import swimming.agent.CoachAgent
 import swimming.agent.DSLTranslatorAgent
 import swimming.agent.OptimizerAgent
 import swimming.model.AnalysisResult
+import swimming.model.UserProfile
 import swimming.service.LLMService
 import swimming.service.RascalService
 import swimming.ui.*
 import swimming.ui.theme.*
 import java.awt.Taskbar
+import java.io.File
 import javax.imageio.ImageIO
 
 fun main() {
@@ -57,18 +61,37 @@ fun main() {
                 BitmapPainter(Image.makeFromEncoded(bytes).toComposeImageBitmap())
             } else null
         }
+        val json = remember { Json { ignoreUnknownKeys = true } }
+        val profileFile = remember {
+            File(System.getProperty("user.home"), ".swimmingdsl/profile.json")
+        }
+        var showOnboarding by remember { mutableStateOf(!profileFile.exists()) }
+
         Window(
             onCloseRequest = ::exitApplication,
             title = "Swimming DSL - Desktop",
             state = state,
             icon = iconPainter
         ) {
-            SwimmingDslApp()
+            if (showOnboarding) {
+                OnboardingScreen(onComplete = { profile ->
+                    profileFile.parentFile.mkdirs()
+                    profileFile.writeText(json.encodeToString(profile))
+                    showOnboarding = false
+                })
+            } else {
+                val profile = remember {
+                    try { json.decodeFromString<UserProfile>(profileFile.readText()) }
+                    catch (_: Exception) { UserProfile() }
+                }
+                SwimmingDslApp(profile = profile)
+            }
         }
     }
 }
 
 enum class AppTab(val label: String) {
+    DASHBOARD("Dashboard"),
     EDITOR("Editor"),
     TRANSLATOR("Traductor IA"),
     COACH("Coach IA"),
@@ -76,14 +99,15 @@ enum class AppTab(val label: String) {
 }
 
 @Composable
-fun SwimmingDslApp() {
+fun SwimmingDslApp(profile: UserProfile = UserProfile()) {
+    val json = remember { Json { ignoreUnknownKeys = true } }
     val rascalService = remember { RascalService() }
     val llmService = remember { LLMService() }
-    val translatorAgent = remember { DSLTranslatorAgent(llmService, rascalService) }
+    val translatorAgent = remember { DSLTranslatorAgent(llmService, rascalService, userProfile = profile) }
     val coachAgent = remember { CoachAgent(llmService) }
     val optimizerAgent = remember { OptimizerAgent(llmService, rascalService) }
     val scope = rememberCoroutineScope()
-    var selectedTab by remember { mutableStateOf(AppTab.EDITOR) }
+    var selectedTab by remember { mutableStateOf(AppTab.DASHBOARD) }
     var code by remember {
         mutableStateOf(
             """session morning {
@@ -98,19 +122,33 @@ fun SwimmingDslApp() {
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
+    // Session history persistence
+    val historyFile = remember {
+        File(System.getProperty("user.home"), ".swimmingdsl/history.json")
+    }
+    var sessionHistory by remember {
+        mutableStateOf<List<AnalysisResult>>(
+            try { json.decodeFromString(historyFile.readText()) }
+            catch (_: Exception) { emptyList() }
+        )
+    }
+
     val doAnalyze: (String) -> Unit = { codeToAnalyze ->
         scope.launch {
             isLoading = true
             errorMessage = null
             val result = rascalService.analyze(codeToAnalyze)
             analysisResult = result
-            if (!result.success) {
+            if (result.success) {
+                sessionHistory = sessionHistory + result
+                historyFile.parentFile.mkdirs()
+                historyFile.writeText(json.encodeToString(sessionHistory))
+            } else {
                 errorMessage = result.error
             }
             isLoading = false
         }
     }
-    
 
     Column(
         modifier = Modifier
@@ -165,6 +203,13 @@ fun SwimmingDslApp() {
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     when (tab) {
+                        AppTab.DASHBOARD -> {
+                            DashboardPanel(
+                                sessionHistory = sessionHistory,
+                                profile = profile,
+                                modifier = Modifier.weight(1f).fillMaxHeight()
+                            )
+                        }
                         AppTab.EDITOR -> {
                             EditorPanel(
                                 code = code,
@@ -204,12 +249,15 @@ fun SwimmingDslApp() {
                             )
                         }
                     }
-                    AnalysisPanel(
-                        result = analysisResult,
-                        isLoading = isLoading,
-                        errorMessage = errorMessage,
-                        modifier = Modifier.weight(1f).fillMaxHeight()
-                    )
+                    // Show AnalysisPanel on the right for all tabs except DASHBOARD
+                    if (tab != AppTab.DASHBOARD) {
+                        AnalysisPanel(
+                            result = analysisResult,
+                            isLoading = isLoading,
+                            errorMessage = errorMessage,
+                            modifier = Modifier.weight(1f).fillMaxHeight()
+                        )
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package swimming.agent
 
+import swimming.model.UserProfile
 import swimming.service.ChatMessage
 import swimming.service.LLMService
 import swimming.service.RascalService
@@ -13,7 +14,8 @@ data class TranslationResult(
 
 class DSLTranslatorAgent(
     private val llmService: LLMService,
-    private val rascalService: RascalService
+    private val rascalService: RascalService,
+    private val userProfile: UserProfile = UserProfile()
 ) {
 
     companion object {
