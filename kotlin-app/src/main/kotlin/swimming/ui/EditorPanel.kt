@@ -91,11 +91,7 @@ fun EditorPanel(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("\uD83D\uDCDD", fontSize = 18.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Editor", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
-                }
+                Text("Editor", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
                 Box {
                     OutlinedButton(
                         onClick = { examplesExpanded = true },

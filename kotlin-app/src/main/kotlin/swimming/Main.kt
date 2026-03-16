@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
@@ -41,7 +40,6 @@ import java.awt.Taskbar
 import javax.imageio.ImageIO
 
 fun main() {
-    // macOS Dock icon
     try {
         val iconStream = object {}.javaClass.getResourceAsStream("/app_icon.png")
         if (iconStream != null) {
@@ -70,11 +68,11 @@ fun main() {
     }
 }
 
-private enum class AppTab(val label: String, val icon: String) {
-    EDITOR("Editor", "\uD83D\uDCDD"),
-    TRANSLATOR("Traductor IA", "\uD83C\uDF10"),
-    COACH("Coach IA", "\uD83C\uDFCB\uFE0F"),
-    OPTIMIZER("Optimizador IA", "\u26A1")
+enum class AppTab(val label: String) {
+    EDITOR("Editor"),
+    TRANSLATOR("Traductor IA"),
+    COACH("Coach IA"),
+    OPTIMIZER("Optimizador IA")
 }
 
 @Composable
@@ -85,7 +83,6 @@ fun SwimmingDslApp() {
     val coachAgent = remember { CoachAgent(llmService) }
     val optimizerAgent = remember { OptimizerAgent(llmService, rascalService) }
     val scope = rememberCoroutineScope()
-
     var selectedTab by remember { mutableStateOf(AppTab.EDITOR) }
     var code by remember {
         mutableStateOf(
@@ -113,169 +110,107 @@ fun SwimmingDslApp() {
             isLoading = false
         }
     }
+    
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
     ) {
-        // Header with gradient + depth
+        // Header
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(8.dp)
-                .background(
-                    Brush.linearGradient(
-                        listOf(PrimaryDark, Primary, Secondary)
-                    )
-                )
+                .background(WaterDark)
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Animated wave emoji
-                    val infiniteTransition = rememberInfiniteTransition()
-                    val wave by infiniteTransition.animateFloat(
-                        initialValue = -4f,
-                        targetValue = 4f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(1200, easing = EaseInOutSine),
-                            repeatMode = RepeatMode.Reverse
-                        )
-                    )
-                    Text(
-                        text = "\uD83C\uDFCA",
-                        fontSize = 28.sp,
-                        modifier = Modifier.graphicsLayer { translationY = wave }
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(
-                        text = "Swimming DSL",
-                        color = Color.White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = "Desktop • Rascal + IA",
-                        color = Color.White.copy(alpha = 0.9f),
-                        fontSize = 13.sp,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(Color.White.copy(alpha = 0.15f))
-                            .padding(horizontal = 14.dp, vertical = 5.dp)
-                    )
-                }
-                // Tab navigation with hover + animated indicator
-                Spacer(modifier = Modifier.height(14.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    AppTab.entries.forEach { tab ->
-                        val isSelected = selectedTab == tab
-                        val interactionSource = remember { MutableInteractionSource() }
-                        val isHovered by interactionSource.collectIsHoveredAsState()
-
-                        val bgAlpha by animateFloatAsState(
-                            targetValue = when {
-                                isSelected -> 0.28f
-                                isHovered -> 0.15f
-                                else -> 0f
-                            },
-                            animationSpec = tween(ANIM_FAST)
-                        )
-                        val textAlpha by animateFloatAsState(
-                            targetValue = if (isSelected || isHovered) 1f else 0.6f,
-                            animationSpec = tween(ANIM_FAST)
-                        )
-                        val scale by animateFloatAsState(
-                            targetValue = if (isSelected) 1.02f else 1f,
-                            animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-                        )
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .graphicsLayer { scaleX = scale; scaleY = scale }
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color.White.copy(alpha = bgAlpha))
-                                .hoverable(interactionSource)
-                                .clickable { selectedTab = tab }
-                                .padding(horizontal = 14.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                text = tab.icon,
-                                fontSize = 15.sp,
-                                modifier = Modifier.padding(end = 6.dp)
-                            )
-                            Text(
-                                text = tab.label,
-                                color = Color.White.copy(alpha = textAlpha),
-                                fontSize = 14.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                            )
-                        }
-                    }
-                }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Swimming DSL",
+                    color = Color.White,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Desktop \u2022 Rascal + IA",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 13.sp,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color.White.copy(alpha = 0.15f))
+                        .padding(horizontal = 14.dp, vertical = 5.dp)
+                )
             }
         }
 
-        // Animated content based on selected tab
-        Crossfade(
-            targetState = selectedTab,
-            animationSpec = tween(ANIM_MEDIUM),
-            modifier = Modifier.fillMaxSize()
-        ) { tab ->
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(20.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                when (tab) {
-                    AppTab.EDITOR -> {
-                        EditorPanel(
-                            code = code,
-                            onCodeChange = { code = it },
-                            onAnalyze = { doAnalyze(it) },
-                            isLoading = isLoading,
-                            modifier = Modifier.weight(1f).fillMaxHeight()
-                        )
+        // Sidebar + content
+        Row(Modifier.fillMaxSize()) {
+            SidebarNav(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it },
+                modifier = Modifier.width(200.dp).fillMaxHeight()
+            )
+
+            Crossfade(
+                targetState = selectedTab,
+                animationSpec = tween(ANIM_MEDIUM),
+                modifier = Modifier.fillMaxSize()
+            ) { tab ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
+                    when (tab) {
+                        AppTab.EDITOR -> {
+                            EditorPanel(
+                                code = code,
+                                onCodeChange = { code = it },
+                                onAnalyze = { doAnalyze(it) },
+                                isLoading = isLoading,
+                                modifier = Modifier.weight(1f).fillMaxHeight()
+                            )
+                        }
+                        AppTab.TRANSLATOR -> {
+                            TranslatorPanel(
+                                translatorAgent = translatorAgent,
+                                onCodeGenerated = { generatedCode ->
+                                    code = generatedCode
+                                },
+                                onAnalyze = { doAnalyze(it) },
+                                modifier = Modifier.weight(1f).fillMaxHeight()
+                            )
+                        }
+                        AppTab.COACH -> {
+                            CoachPanel(
+                                coachAgent = coachAgent,
+                                analysisResult = analysisResult,
+                                currentCode = code,
+                                modifier = Modifier.weight(1f).fillMaxHeight()
+                            )
+                        }
+                        AppTab.OPTIMIZER -> {
+                            OptimizerPanel(
+                                optimizerAgent = optimizerAgent,
+                                onLoadSession = { sessionCode ->
+                                    code = sessionCode
+                                    selectedTab = AppTab.EDITOR
+                                    doAnalyze(sessionCode)
+                                },
+                                modifier = Modifier.weight(1f).fillMaxHeight()
+                            )
+                        }
                     }
-                    AppTab.TRANSLATOR -> {
-                        TranslatorPanel(
-                            translatorAgent = translatorAgent,
-                            onCodeGenerated = { generatedCode ->
-                                code = generatedCode
-                            },
-                            onAnalyze = { doAnalyze(it) },
-                            modifier = Modifier.weight(1f).fillMaxHeight()
-                        )
-                    }
-                    AppTab.COACH -> {
-                        CoachPanel(
-                            coachAgent = coachAgent,
-                            analysisResult = analysisResult,
-                            currentCode = code,
-                            modifier = Modifier.weight(1f).fillMaxHeight()
-                        )
-                    }
-                    AppTab.OPTIMIZER -> {
-                        OptimizerPanel(
-                            optimizerAgent = optimizerAgent,
-                            onLoadSession = { sessionCode ->
-                                code = sessionCode
-                                selectedTab = AppTab.EDITOR
-                                doAnalyze(sessionCode)
-                            },
-                            modifier = Modifier.weight(1f).fillMaxHeight()
-                        )
-                    }
+                    AnalysisPanel(
+                        result = analysisResult,
+                        isLoading = isLoading,
+                        errorMessage = errorMessage,
+                        modifier = Modifier.weight(1f).fillMaxHeight()
+                    )
                 }
-                AnalysisPanel(
-                    result = analysisResult,
-                    isLoading = isLoading,
-                    errorMessage = errorMessage,
-                    modifier = Modifier.weight(1f).fillMaxHeight()
-                )
             }
         }
     }

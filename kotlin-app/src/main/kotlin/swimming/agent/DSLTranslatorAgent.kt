@@ -90,7 +90,7 @@ IMPORTANT RULES:
 
         for (attempt in 1..MAX_RETRIES) {
             val response = try {
-                llmService.chat(SYSTEM_PROMPT, messages)
+                llmService.chat(SYSTEM_PROMPT, messages, temperature = 0.2)
             } catch (e: Exception) {
                 return TranslationResult(
                     success = false,

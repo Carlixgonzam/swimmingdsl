@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import swimming.agent.OptimizationConfig
 import swimming.agent.OptimizationResult
 import swimming.agent.OptimizerAgent
+import swimming.ui.components.SwimmerLoadingAnimation
 import swimming.ui.theme.*
 
 private val GOALS = listOf(
@@ -72,11 +73,7 @@ fun OptimizerPanel(
                     .background(Background)
                     .padding(horizontal = 20.dp, vertical = 15.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("\u26A1", fontSize = 18.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Optimizador IA", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
-                }
+                Text("Optimizador IA", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
             }
 
             Column(
@@ -220,21 +217,7 @@ fun OptimizerPanel(
 
                 // Progress indicator
                 if (isOptimizing) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = Primary,
-                            strokeWidth = 2.dp
-                        )
-                        Text(
-                            progressMessage ?: "Iniciando optimización...",
-                            color = TextLight,
-                            fontSize = 13.sp
-                        )
-                    }
+                    SwimmerLoadingAnimation(progressMessage ?: "Optimizando...")
                 }
 
                 // Error

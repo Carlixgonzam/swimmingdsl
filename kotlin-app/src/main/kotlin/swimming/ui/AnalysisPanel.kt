@@ -11,7 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,11 +43,7 @@ fun AnalysisPanel(
                     .background(Background)
                     .padding(horizontal = 20.dp, vertical = 15.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("\uD83D\uDCCA", fontSize = 18.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Análisis", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
-                }
+                Text("Análisis", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
             }
             Box(modifier = Modifier.padding(20.dp)) {
                 Crossfade(
@@ -73,27 +71,10 @@ fun AnalysisPanel(
 
 @Composable
 private fun LoadingState() {
-    val infiniteTransition = rememberInfiniteTransition()
-    val pulse by infiniteTransition.animateFloat(
-        initialValue = 0.6f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = EaseInOutSine),
-            repeatMode = RepeatMode.Reverse
-        )
+    SwimmerLoadingAnimation(
+        message = "Analizando con Rascal...",
+        modifier = Modifier.padding(20.dp)
     )
-    Column(
-        modifier = Modifier.fillMaxWidth().padding(40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        CircularProgressIndicator(color = Primary, strokeWidth = 3.dp)
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            "Analizando con Rascal...",
-            color = TextLight,
-            modifier = Modifier.graphicsLayer { alpha = pulse }
-        )
-    }
 }
 
 @Composable
@@ -192,11 +173,45 @@ private fun AnalysisContent(result: AnalysisResult) {
         }
 
         // Styles section
+        // Reemplazar el bloque "Styles section" existente:
         if (result.styles.isNotEmpty()) {
             AnalysisSection("Estilos") {
-                FlowTags {
-                    result.styles.forEach { (style, count) ->
-                        TagChip("$style: $count", TagType.STYLE)
+                val total = result.styles.values.sum().toFloat()
+                val barColors = listOf(Primary, Secondary, Color(0xFF0077B6), Color(0xFF90E0EF))
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    result.styles.entries.forEachIndexed { i, (style, count) ->
+                        val pct = if (total > 0) count / total else 0f
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                style.replaceFirstChar { it.uppercase() },
+                                fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+                                color = TextColor,
+                                modifier = Modifier.width(80.dp)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f).height(6.dp)
+                                    .clip(RoundedCornerShape(3.dp))
+                                    .background(BorderLight)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .fillMaxWidth(pct)
+                                        .clip(RoundedCornerShape(3.dp))
+                                        .background(barColors.getOrElse(i) { Primary })
+                                )
+                            }
+                            Text(
+                                "${(pct * 100).toInt()}%",
+                                fontSize = 10.sp, color = MutedText,
+                                fontFamily = MonospaceFont,
+                                modifier = Modifier.width(28.dp)
+                            )
+                        }
                     }
                 }
             }

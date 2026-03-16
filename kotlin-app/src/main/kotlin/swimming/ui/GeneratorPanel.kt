@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import swimming.service.RascalService
+import swimming.ui.components.SwimmerLoadingAnimation
 import swimming.ui.theme.SuccessColor
 import swimming.util.adjustGeneratedDistance
 
@@ -145,7 +146,11 @@ fun GeneratorPanel(
             colors = ButtonDefaults.buttonColors(containerColor = SuccessColor),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text(if (generating) "Generando..." else "⚡ Generar Sesión")
+            Text(if (generating) "Generando..." else "Generar Sesi\u00f3n")
+        }
+
+        if (generating) {
+            SwimmerLoadingAnimation("Generando sesi\u00f3n...")
         }
     }
 }

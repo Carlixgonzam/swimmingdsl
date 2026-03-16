@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import swimming.agent.DSLTranslatorAgent
 import swimming.agent.TranslationResult
+import swimming.ui.components.SwimmerLoadingAnimation
 import swimming.ui.theme.*
 
 @Composable
@@ -48,16 +49,12 @@ fun TranslatorPanel(
                     .background(Background)
                     .padding(horizontal = 20.dp, vertical = 15.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("\uD83C\uDF10", fontSize = 18.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        "Traductor IA",
-                        fontWeight = FontWeight.SemiBold,
-                        color = TextColor,
-                        fontSize = 16.sp
-                    )
-                }
+                Text(
+                    "Traductor IA",
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextColor,
+                    fontSize = 16.sp
+                )
             }
 
             Column(
@@ -123,17 +120,7 @@ fun TranslatorPanel(
                 }
 
                 if (isTranslating) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = Primary,
-                            strokeWidth = 2.dp
-                        )
-                        Text("Generando código DSL con IA...", color = TextLight, fontSize = 13.sp)
-                    }
+                    SwimmerLoadingAnimation("Generando código DSL...")
                 }
 
                 result?.let { res ->

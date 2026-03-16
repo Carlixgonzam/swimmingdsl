@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import swimming.agent.CoachAgent
 import swimming.model.AnalysisResult
+import swimming.ui.components.SwimmerLoadingAnimation
 import swimming.ui.theme.*
 
 data class ChatBubble(val role: String, val content: String)
@@ -61,11 +62,7 @@ fun CoachPanel(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("\uD83C\uDFCB\uFE0F", fontSize = 18.sp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Coach IA", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
-                }
+                Text("Coach IA", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
                 OutlinedButton(
                     onClick = {
                         coachAgent.resetConversation()
@@ -191,31 +188,7 @@ fun CoachPanel(
                 }
 
                 if (isSending) {
-                    val infiniteTransition = rememberInfiniteTransition()
-                    val dotAlpha by infiniteTransition.animateFloat(
-                        initialValue = 0.3f,
-                        targetValue = 1f,
-                        animationSpec = infiniteRepeatable(
-                            animation = tween(600, easing = EaseInOutSine),
-                            repeatMode = RepeatMode.Reverse
-                        )
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            color = Primary,
-                            strokeWidth = 2.dp
-                        )
-                        Text(
-                            "Coach pensando...",
-                            color = TextLight,
-                            fontSize = 13.sp,
-                            modifier = Modifier.graphicsLayer { alpha = dotAlpha }
-                        )
-                    }
+                    SwimmerLoadingAnimation("Coach pensando...")
                 }
 
                 errorMessage?.let {

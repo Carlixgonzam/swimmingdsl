@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -24,10 +25,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import swimming.ui.theme.Primary
-import swimming.ui.theme.PrimaryLight
-import swimming.ui.theme.Secondary
-import swimming.ui.theme.SecondaryLight
+import swimming.ui.theme.*
 
 @Composable
 fun StatCard(
@@ -48,35 +46,20 @@ fun StatCard(
     )
 
     Box(
-        modifier = modifier
-            .graphicsLayer {
-                scaleX = scale; scaleY = scale
-            }
-            .shadow(elevation, RoundedCornerShape(12.dp))
-            .clip(RoundedCornerShape(12.dp))
-            .background(
-                Brush.linearGradient(
-                    if (isHovered) listOf(PrimaryLight, SecondaryLight)
-                    else listOf(Primary, Secondary)
-                )
-            )
-            .hoverable(interactionSource)
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = value,
-                color = Color.White,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = label,
-                color = Color.White.copy(alpha = 0.92f),
-                fontSize = 13.sp
-            )
-        }
+    modifier = modifier
+        .graphicsLayer { scaleX = scale; scaleY = scale }
+        .shadow(elevation, RoundedCornerShape(12.dp))
+        .clip(RoundedCornerShape(12.dp))
+        .background(Color.White)
+        .border(0.5.dp, BorderLight, RoundedCornerShape(12.dp))
+        .hoverable(interactionSource)
+        .padding(16.dp),
+    contentAlignment = Alignment.Center
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(value, color = LaneDark, fontSize = 26.sp, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.height(2.dp))
+        Text(label, color = MutedText, fontSize = 13.sp)
     }
+}
 }
