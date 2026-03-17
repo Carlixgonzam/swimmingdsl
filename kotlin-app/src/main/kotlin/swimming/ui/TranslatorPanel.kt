@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import swimming.agent.DSLTranslatorAgent
 import swimming.agent.TranslationResult
-import swimming.ui.components.SwimmerLoadingAnimation
 import swimming.ui.theme.*
 
 @Composable
@@ -119,8 +118,12 @@ fun TranslatorPanel(
                     Text(if (isTranslating) "Traduciendo..." else "Traducir a DSL")
                 }
 
+                // ← CAMBIO: UnderwaterAnimation en vez de SwimmerLoadingAnimation
                 if (isTranslating) {
-                    SwimmerLoadingAnimation("Generando código DSL...")
+                    UnderwaterAnimation(
+                        message = "Generando código DSL...",
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
                 }
 
                 result?.let { res ->

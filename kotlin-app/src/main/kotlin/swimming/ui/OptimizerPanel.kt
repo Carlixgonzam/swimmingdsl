@@ -24,7 +24,6 @@ import kotlinx.coroutines.launch
 import swimming.agent.OptimizationConfig
 import swimming.agent.OptimizationResult
 import swimming.agent.OptimizerAgent
-import swimming.ui.components.SwimmerLoadingAnimation
 import swimming.ui.theme.*
 
 private val GOALS = listOf(
@@ -73,7 +72,12 @@ fun OptimizerPanel(
                     .background(Background)
                     .padding(horizontal = 20.dp, vertical = 15.dp)
             ) {
-                Text("Optimizador IA", fontWeight = FontWeight.SemiBold, color = TextColor, fontSize = 16.sp)
+                Text(
+                    "Optimizador IA",
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextColor,
+                    fontSize = 16.sp
+                )
             }
 
             Column(
@@ -83,7 +87,6 @@ fun OptimizerPanel(
                     .padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Goal selector
                 Text("Objetivo", fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 Box {
                     OutlinedButton(
@@ -109,7 +112,6 @@ fun OptimizerPanel(
                     }
                 }
 
-                // Config fields
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -162,7 +164,6 @@ fun OptimizerPanel(
                     }
                 }
 
-                // Styles
                 Text("Estilos", fontSize = 14.sp, fontWeight = FontWeight.Medium)
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -182,7 +183,6 @@ fun OptimizerPanel(
                     }
                 }
 
-                // Generate button
                 Button(
                     onClick = {
                         scope.launch {
@@ -215,12 +215,15 @@ fun OptimizerPanel(
                     Text(if (isOptimizing) "Optimizando..." else "Generar Plan de Entrenamiento")
                 }
 
-                // Progress indicator
+                // ← CAMBIO: RelayRaceAnimation en vez de SwimmerLoadingAnimation
+                // muestra el progressMessage en vivo como mensaje de la animación
                 if (isOptimizing) {
-                    SwimmerLoadingAnimation(progressMessage ?: "Optimizando...")
+                    RelayRaceAnimation(
+                        message = progressMessage ?: "Optimizando plan...",
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+                    )
                 }
 
-                // Error
                 errorMessage?.let {
                     Box(
                         modifier = Modifier
@@ -232,7 +235,6 @@ fun OptimizerPanel(
                     }
                 }
 
-                // Results
                 result?.let { res ->
                     if (res.sessions.isNotEmpty()) {
                         Text(
@@ -243,7 +245,6 @@ fun OptimizerPanel(
                             modifier = Modifier.padding(top = 10.dp)
                         )
 
-                        // Summary
                         val totalDist = res.sessions.sumOf { it.analysis.totalDistance }
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -275,7 +276,6 @@ fun OptimizerPanel(
                             }
                         }
 
-                        // Individual sessions
                         res.sessions.forEach { session ->
                             val sessionInteraction = remember { MutableInteractionSource() }
                             val sessionHovered by sessionInteraction.collectIsHoveredAsState()
@@ -300,7 +300,7 @@ fun OptimizerPanel(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            "\uD83D\uDCC5 Semana ${session.week} - Sesión ${session.sessionNumber}",
+                                            "Semana ${session.week} - Sesión ${session.sessionNumber}",
                                             fontWeight = FontWeight.SemiBold,
                                             fontSize = 14.sp,
                                             color = TextColor
@@ -319,19 +319,19 @@ fun OptimizerPanel(
                                                 .graphicsLayer { scaleX = loadScale; scaleY = loadScale }
                                                 .hoverable(loadInteraction)
                                         ) {
-                                            Text("\u25B6 Cargar", fontSize = 12.sp)
+                                            Text("▶ Cargar", fontSize = 12.sp)
                                         }
                                     }
                                     Spacer(modifier = Modifier.height(6.dp))
                                     Row(horizontalArrangement = Arrangement.spacedBy(15.dp)) {
                                         Text(
-                                            "\uD83C\uDFCA ${session.analysis.totalDistance}m",
+                                            "${session.analysis.totalDistance}m",
                                             fontSize = 13.sp,
                                             color = Primary,
                                             fontWeight = FontWeight.Medium
                                         )
                                         Text(
-                                            "\u23F1 ${session.analysis.time.totalFormatted}",
+                                            session.analysis.time.totalFormatted,
                                             fontSize = 13.sp,
                                             color = TextLight
                                         )

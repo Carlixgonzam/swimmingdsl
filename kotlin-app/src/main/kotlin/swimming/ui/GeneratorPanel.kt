@@ -10,7 +10,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import swimming.service.RascalService
-import swimming.ui.components.SwimmerLoadingAnimation
 import swimming.ui.theme.SuccessColor
 import swimming.util.adjustGeneratedDistance
 
@@ -29,8 +28,6 @@ private val STYLE_OPTIONS = listOf(
     "breaststroke" to "Breaststroke",
     "butterfly" to "Butterfly"
 )
-
-// Distance adjustment is now in swimming.util.adjustGeneratedDistance
 
 @Composable
 fun GeneratorPanel(
@@ -51,8 +48,11 @@ fun GeneratorPanel(
         modifier = Modifier.padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
-        // Goal selector
-        Text("Objetivo", fontSize = 14.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Medium)
+        Text(
+            "Objetivo",
+            fontSize = 14.sp,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+        )
         Box {
             OutlinedButton(
                 onClick = { goalExpanded = true },
@@ -77,8 +77,11 @@ fun GeneratorPanel(
             }
         }
 
-        // Distance
-        Text("Distancia Total (metros)", fontSize = 14.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Medium)
+        Text(
+            "Distancia Total (metros)",
+            fontSize = 14.sp,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+        )
         OutlinedTextField(
             value = distance,
             onValueChange = { distance = it.filter { c -> c.isDigit() } },
@@ -87,8 +90,11 @@ fun GeneratorPanel(
             shape = RoundedCornerShape(6.dp)
         )
 
-        // Styles checkboxes
-        Text("Estilos", fontSize = 14.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Medium)
+        Text(
+            "Estilos",
+            fontSize = 14.sp,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+        )
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxWidth()
@@ -107,8 +113,11 @@ fun GeneratorPanel(
             }
         }
 
-        // Duration
-        Text("Duración (minutos)", fontSize = 14.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Medium)
+        Text(
+            "Duración (minutos)",
+            fontSize = 14.sp,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Medium
+        )
         OutlinedTextField(
             value = duration,
             onValueChange = { duration = it.filter { c -> c.isDigit() } },
@@ -117,12 +126,10 @@ fun GeneratorPanel(
             shape = RoundedCornerShape(6.dp)
         )
 
-        // Error message
         errorMessage?.let { err ->
             Text(err, color = MaterialTheme.colorScheme.error, fontSize = 13.sp)
         }
 
-        // Generate button
         Button(
             onClick = {
                 scope.launch {
@@ -146,11 +153,15 @@ fun GeneratorPanel(
             colors = ButtonDefaults.buttonColors(containerColor = SuccessColor),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text(if (generating) "Generando..." else "Generar Sesi\u00f3n")
+            Text(if (generating) "Generando..." else "Generar Sesión")
         }
 
+        // ← CAMBIO: DivingAnimation en vez de SwimmerLoadingAnimation
         if (generating) {
-            SwimmerLoadingAnimation("Generando sesi\u00f3n...")
+            DivingAnimation(
+                message = "Generando sesión...",
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+            )
         }
     }
 }

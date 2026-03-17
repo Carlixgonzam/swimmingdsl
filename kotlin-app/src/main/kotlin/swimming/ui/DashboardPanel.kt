@@ -26,30 +26,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import swimming.model.AnalysisResult
 import swimming.model.UserProfile
-import swimming.ui.components.SwimmerLoadingAnimation
 import swimming.ui.theme.*
 
 // Chart palette — hardcoded hex (physical scene)
-private val BarHigh = Color(0xFF06A77D)
-private val BarMid = Color(0xFF48CAE4)
-private val BarLow = Color(0xFF0096C7)
-private val StyleFreestyle = Color(0xFF00B4D8)
-private val StyleBackstroke = Color(0xFF48CAE4)
-private val StyleBreaststroke = Color(0xFF0077B6)
-private val StyleButterfly = Color(0xFFF4A261)
-private val IntensityEasyBg = Color(0xFFE0F7EE)
-private val IntensityEasyStroke = Color(0xFF06A77D)
-private val IntensityModerateBg = Color(0xFFFFF3E0)
+private val BarHigh        = Color(0xFF06A77D)
+private val BarMid         = Color(0xFF48CAE4)
+private val BarLow         = Color(0xFF0096C7)
+private val StyleFreestyle   = Color(0xFF00B4D8)
+private val StyleBackstroke  = Color(0xFF48CAE4)
+private val StyleBreaststroke= Color(0xFF0077B6)
+private val StyleButterfly   = Color(0xFFF4A261)
+private val IntensityEasyBg      = Color(0xFFE0F7EE)
+private val IntensityEasyStroke  = Color(0xFF06A77D)
+private val IntensityModerateBg     = Color(0xFFFFF3E0)
 private val IntensityModerateStroke = Color(0xFFF4A261)
-private val IntensityHardBg = Color(0xFFFDE8E8)
-private val IntensityHardStroke = Color(0xFFE05252)
+private val IntensityHardBg    = Color(0xFFFDE8E8)
+private val IntensityHardStroke= Color(0xFFE05252)
 private val WeekGreen = Color(0xFF06A77D)
 
 private val STYLE_COLORS = mapOf(
-    "freestyle" to StyleFreestyle,
-    "backstroke" to StyleBackstroke,
+    "freestyle"    to StyleFreestyle,
+    "backstroke"   to StyleBackstroke,
     "breaststroke" to StyleBreaststroke,
-    "butterfly" to StyleButterfly
+    "butterfly"    to StyleButterfly
 )
 
 @Composable
@@ -65,7 +64,7 @@ fun DashboardPanel(
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // 3a. Header
+        // Header
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -84,24 +83,27 @@ fun DashboardPanel(
             )
         }
 
-        // 3b. Swimmer strip
-        SwimmerLoadingAnimation("", Modifier.fillMaxWidth().height(56.dp))
+        // ← CAMBIO: RelayRaceAnimation como tira decorativa (4 nadadores en carriles)
+        RelayRaceAnimation(
+            message = "",
+            modifier = Modifier.fillMaxWidth().height(90.dp)
+        )
 
         if (sessionHistory.isEmpty()) {
-            // 3e. Empty state
+            // ← CAMBIO: DivingAnimation en empty state
             Column(
                 modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SwimmerLoadingAnimation("Analiza tu primera sesión para ver estadísticas")
+                DivingAnimation(
+                    message = "Analiza tu primera sesión para ver estadísticas"
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("No hay datos aún", color = MutedText, fontSize = 13.sp)
             }
         } else {
-            // 3c. Metrics row
             MetricsRow(sessionHistory)
 
-            // 3d. Charts grid — 2 rows of 2
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -177,13 +179,11 @@ private fun ChartCard(title: String, modifier: Modifier, content: @Composable ()
     }
 }
 
-// CHART 1 — Distance bar chart
 @Composable
 private fun DistanceBarChart(history: List<AnalysisResult>) {
     val data = history.takeLast(12)
     val maxDist = data.maxOfOrNull { it.totalDistance }?.toFloat() ?: 1f
 
-    // Animate bar heights keyed on history size
     val animatedBars = data.mapIndexed { index, result ->
         val fraction = result.totalDistance / maxDist
         key(history.size) {
@@ -199,7 +199,7 @@ private fun DistanceBarChart(history: List<AnalysisResult>) {
         if (count == 0) return@Canvas
         val gap = 4.dp.toPx()
         val barWidth = (size.width - gap * (count - 1)) / count
-        val maxH = size.height - 16.dp.toPx() // leave room for labels
+        val maxH = size.height - 16.dp.toPx()
 
         data.forEachIndexed { i, result ->
             val fraction = animatedBars[i].value
@@ -216,7 +216,6 @@ private fun DistanceBarChart(history: List<AnalysisResult>) {
                 size = Size(barWidth, barH),
                 cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx())
             )
-            // Label below
             drawContext.canvas.nativeCanvas.apply {
                 val paint = org.jetbrains.skia.Paint().apply {
                     this.color = org.jetbrains.skia.Color.makeARGB(153, 90, 143, 160)
@@ -230,7 +229,6 @@ private fun DistanceBarChart(history: List<AnalysisResult>) {
     }
 }
 
-// CHART 2 — Style donut chart
 @Composable
 private fun StyleDonutChart(history: List<AnalysisResult>) {
     val aggregated = mutableMapOf<String, Int>()
@@ -242,7 +240,6 @@ private fun StyleDonutChart(history: List<AnalysisResult>) {
     val total = aggregated.values.sum().toFloat().coerceAtLeast(1f)
     val entries = aggregated.entries.sortedByDescending { it.value }
 
-    // Animate sweep angles
     val animatedSweeps = entries.mapIndexed { index, entry ->
         val target = (entry.value / total) * 360f
         key(history.size) {
@@ -282,17 +279,11 @@ private fun StyleDonutChart(history: List<AnalysisResult>) {
                 val pct = ((entry.value / total) * 100).toInt()
                 val color = STYLE_COLORS[entry.key] ?: BarMid
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier.size(8.dp)
-                            .clip(CircleShape)
-                            .background(color)
-                    )
+                    Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(color))
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         "${entry.key.replaceFirstChar { it.uppercase() }} $pct%",
-                        fontSize = 10.sp,
-                        color = MutedText,
-                        fontFamily = MonospaceFont
+                        fontSize = 10.sp, color = MutedText, fontFamily = MonospaceFont
                     )
                 }
             }
@@ -300,7 +291,6 @@ private fun StyleDonutChart(history: List<AnalysisResult>) {
     }
 }
 
-// CHART 3 — Intensity timeline
 @Composable
 private fun IntensityTimeline(history: List<AnalysisResult>) {
     val data = history.takeLast(12)
@@ -313,55 +303,39 @@ private fun IntensityTimeline(history: List<AnalysisResult>) {
         val maxH = size.height - 16.dp.toPx()
 
         data.forEachIndexed { i, result ->
-            val easy = result.intensities["easy"] ?: 0
+            val easy     = result.intensities["easy"]     ?: 0
             val moderate = result.intensities["moderate"] ?: 0
-            val hard = result.intensities["hard"] ?: 0
-            val totalI = (easy + moderate + hard).coerceAtLeast(1)
-            val hardPct = hard.toFloat() / totalI
+            val hard     = result.intensities["hard"]     ?: 0
+            val totalI   = (easy + moderate + hard).coerceAtLeast(1)
+            val hardPct  = hard.toFloat() / totalI
             val dominant = when {
                 hard >= moderate && hard >= easy -> "hard"
                 moderate >= easy -> "moderate"
                 else -> "easy"
             }
             val (bgColor, strokeColor) = when (dominant) {
-                "hard" -> IntensityHardBg to IntensityHardStroke
+                "hard"     -> IntensityHardBg to IntensityHardStroke
                 "moderate" -> IntensityModerateBg to IntensityModerateStroke
-                else -> IntensityEasyBg to IntensityEasyStroke
+                else       -> IntensityEasyBg to IntensityEasyStroke
             }
-
             val barH = (0.3f + hardPct * 0.7f) * maxH
             val x = i * (barWidth + gap)
-
-            drawRoundRect(
-                color = bgColor,
-                topLeft = Offset(x, maxH - barH),
-                size = Size(barWidth, barH),
-                cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx())
-            )
-            drawRoundRect(
-                color = strokeColor,
-                topLeft = Offset(x, maxH - barH),
-                size = Size(barWidth, barH),
-                cornerRadius = CornerRadius(3.dp.toPx(), 3.dp.toPx()),
-                style = Stroke(width = 1.dp.toPx())
-            )
-            // Label
+            drawRoundRect(bgColor, Offset(x, maxH - barH), Size(barWidth, barH),
+                CornerRadius(3.dp.toPx()))
+            drawRoundRect(strokeColor, Offset(x, maxH - barH), Size(barWidth, barH),
+                CornerRadius(3.dp.toPx()), style = Stroke(1.dp.toPx()))
             drawContext.canvas.nativeCanvas.apply {
                 val paint = org.jetbrains.skia.Paint().apply {
                     this.color = org.jetbrains.skia.Color.makeARGB(153, 90, 143, 160)
                 }
                 val font = org.jetbrains.skia.Font(null, 8.dp.toPx())
                 val label = "S${i + 1}"
-                val textWidth = font.measureTextWidth(label)
-                drawString(label, x + (barWidth - textWidth) / 2, size.height, font, paint)
+                val tw = font.measureTextWidth(label)
+                drawString(label, x + (barWidth - tw) / 2, size.height, font, paint)
             }
         }
     }
-    // Legend
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.padding(top = 4.dp)
-    ) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.padding(top = 4.dp)) {
         LegendDot(IntensityEasyStroke, "Easy")
         LegendDot(IntensityModerateStroke, "Moderate")
         LegendDot(IntensityHardStroke, "Hard")
@@ -377,10 +351,8 @@ private fun LegendDot(color: Color, label: String) {
     }
 }
 
-// CHART 4 — Weekly progress horizontal bars
 @Composable
 private fun WeeklyProgressBars(history: List<AnalysisResult>) {
-    // Group sessions into weeks of ~3
     val sessionsPerWeek = 3
     val weeks = history.chunked(sessionsPerWeek)
     val weekKms = weeks.map { week -> week.sumOf { it.totalDistance } / 1000.0 }
@@ -401,15 +373,12 @@ private fun WeeklyProgressBars(history: List<AnalysisResult>) {
             ) {
                 Text(
                     "Semana ${index + 1}",
-                    fontSize = 10.sp,
-                    color = MutedText,
-                    fontFamily = MonospaceFont,
+                    fontSize = 10.sp, color = MutedText, fontFamily = MonospaceFont,
                     modifier = Modifier.width(64.dp)
                 )
                 Box(
                     modifier = Modifier
-                        .weight(1f)
-                        .height(14.dp)
+                        .weight(1f).height(14.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(BorderLight)
                 ) {
@@ -424,9 +393,7 @@ private fun WeeklyProgressBars(history: List<AnalysisResult>) {
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     "${"%.1f".format(km)} km",
-                    fontSize = 10.sp,
-                    color = LaneDark,
-                    fontFamily = MonospaceFont,
+                    fontSize = 10.sp, color = LaneDark, fontFamily = MonospaceFont,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.width(48.dp)
                 )

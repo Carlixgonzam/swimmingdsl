@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import swimming.agent.CoachAgent
 import swimming.model.AnalysisResult
-import swimming.ui.components.SwimmerLoadingAnimation
 import swimming.ui.theme.*
 
 data class ChatBubble(val role: String, val content: String)
@@ -129,7 +128,6 @@ fun CoachPanel(
                 }
                 chatHistory.forEachIndexed { _, bubble ->
                     val isUser = bubble.role == "user"
-                    // Animate each new message
                     var messageVisible by remember { mutableStateOf(false) }
                     LaunchedEffect(Unit) { messageVisible = true }
 
@@ -142,9 +140,6 @@ fun CoachPanel(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
                         ) {
-                            if (!isUser) {
-                                Text("\uD83C\uDFCB\uFE0F", fontSize = 14.sp, modifier = Modifier.padding(top = 4.dp, end = 6.dp))
-                            }
                             Box(
                                 modifier = Modifier
                                     .widthIn(max = 500.dp)
@@ -166,7 +161,8 @@ fun CoachPanel(
                                     )
                                     .border(
                                         1.dp,
-                                        if (isUser) Primary.copy(alpha = 0.15f) else BorderColor.copy(alpha = 0.5f),
+                                        if (isUser) Primary.copy(alpha = 0.15f)
+                                        else BorderColor.copy(alpha = 0.5f),
                                         RoundedCornerShape(
                                             topStart = if (isUser) 14.dp else 4.dp,
                                             topEnd = if (isUser) 4.dp else 14.dp,
@@ -187,8 +183,12 @@ fun CoachPanel(
                     }
                 }
 
+                // ← CAMBIO: UnderwaterAnimation en vez de SwimmerLoadingAnimation
                 if (isSending) {
-                    SwimmerLoadingAnimation("Coach pensando...")
+                    UnderwaterAnimation(
+                        message = "Coach pensando...",
+                        modifier = Modifier.fillMaxWidth().padding(8.dp)
+                    )
                 }
 
                 errorMessage?.let {
