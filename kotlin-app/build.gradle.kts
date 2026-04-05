@@ -37,3 +37,19 @@ compose.desktop {
         }
     }
 }
+
+tasks.register<JavaExec>("evaluateDsl") {
+    description = "Run the empirical evaluation of the DSL translation pipeline"
+    group = "evaluation"
+    mainClass.set("swimming.evaluation.EvaluationRunnerKt")
+    classpath = sourceSets["main"].runtimeClasspath
+    jvmArgs = listOf("-Xmx1g")
+}
+
+tasks.register<JavaExec>("evaluateComparison") {
+    description = "Run baseline vs hybrid comparative evaluation"
+    group = "evaluation"
+    mainClass.set("swimming.evaluation.BaselineVsHybridEvaluationKt")
+    classpath = sourceSets["main"].runtimeClasspath
+    jvmArgs = listOf("-Xmx1g")
+}

@@ -1,0 +1,682 @@
+{
+    "experimentA": {
+        "metrics": {
+            "totalPrompts": 30,
+            "firstAttemptSuccesses": 18,
+            "firstAttemptRate": 60.0,
+            "totalSuccesses": 26,
+            "successRate": 86.66666666666667,
+            "failures": 4,
+            "failureRate": 13.333333333333334,
+            "avgAttempts": 1.3076923076923077,
+            "byCategory": {
+                "simple": {
+                    "total": 10,
+                    "successes": 10,
+                    "successRate": 100.0,
+                    "avgAttempts": 1.0
+                },
+                "medium": {
+                    "total": 10,
+                    "successes": 9,
+                    "successRate": 90.0,
+                    "avgAttempts": 1.4444444444444444
+                },
+                "hard": {
+                    "total": 10,
+                    "successes": 7,
+                    "successRate": 70.0,
+                    "avgAttempts": 1.5714285714285714
+                }
+            }
+        },
+        "results": [
+            {
+                "promptId": 1,
+                "category": "simple",
+                "prompt": "Create a 500 meter freestyle easy session",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session easyFreestyle {\n  swim 500 m freestyle easy\n}",
+                "error": null,
+                "durationMs": 7313
+            },
+            {
+                "promptId": 2,
+                "category": "simple",
+                "prompt": "I want a 400 meter backstroke workout at moderate intensity",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session workout {\n  swim 400 m backstroke moderate\n}",
+                "error": null,
+                "durationMs": 6487
+            },
+            {
+                "promptId": 3,
+                "category": "simple",
+                "prompt": "Make a simple 800 meter breaststroke session",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session breaststroke800 {\n  swim 200 m breaststroke easy\n  4 x swim 100 m breaststroke moderate rest 20 s\n  swim 200 m breaststroke easy\n}",
+                "error": null,
+                "durationMs": 7759
+            },
+            {
+                "promptId": 4,
+                "category": "simple",
+                "prompt": "Generate a 200 meter butterfly hard sprint session",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session butterflySprint {\n  swim 200 m butterfly hard\n}",
+                "error": null,
+                "durationMs": 7766
+            },
+            {
+                "promptId": 5,
+                "category": "simple",
+                "prompt": "I need a 600 meter easy kick workout",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session kickworkout {\n  kick 600 m easy\n}",
+                "error": null,
+                "durationMs": 6723
+            },
+            {
+                "promptId": 6,
+                "category": "simple",
+                "prompt": "Create a 1000 meter freestyle session at moderate pace of 110 seconds per 100m",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session freestyle {\n  swim 1000 m freestyle moderate pace 110\n}",
+                "error": null,
+                "durationMs": 8331
+            },
+            {
+                "promptId": 7,
+                "category": "simple",
+                "prompt": "Build me a 300 meter backstroke easy warmup session",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session warmup {\n  swim 300 m backstroke easy\n}",
+                "error": null,
+                "durationMs": 7008
+            },
+            {
+                "promptId": 8,
+                "category": "simple",
+                "prompt": "I want a short 400 meter easy swim session",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session shortSwim {\n  swim 400 m freestyle easy pace 120\n}",
+                "error": null,
+                "durationMs": 6931
+            },
+            {
+                "promptId": 9,
+                "category": "simple",
+                "prompt": "Make a 500 meter hard freestyle session with pace 80",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session session1 {\n  swim 500 m freestyle hard pace 80\n}",
+                "error": null,
+                "durationMs": 7073
+            },
+            {
+                "promptId": 10,
+                "category": "simple",
+                "prompt": "Give me a 1000 meter easy endurance swim in freestyle",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session endurance {\n  swim 1000 m freestyle easy\n}",
+                "error": null,
+                "durationMs": 7500
+            },
+            {
+                "promptId": 11,
+                "category": "medium",
+                "prompt": "Create a 1500 meter session with warmup of 400m easy freestyle, main set of 8x100m freestyle hard with 15 second rest, and 200m easy cooldown",
+                "success": true,
+                "attempts": 2,
+                "finalDsl": "session session1500 {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    8 x swim 100 m freestyle hard pace 90 rest 15 s\n  }\n  cooldown {\n    swim 200 m easy pace 120\n  }\n}",
+                "error": null,
+                "durationMs": 20663
+            },
+            {
+                "promptId": 12,
+                "category": "medium",
+                "prompt": "I want interval training: 6 times 100 meter freestyle hard with 20 seconds rest, then finish with 200m easy backstroke",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session intervaltraining {\n  6 x swim 100 m freestyle hard rest 20 s\n  swim 200 m backstroke easy\n}",
+                "error": null,
+                "durationMs": 6749
+            },
+            {
+                "promptId": 13,
+                "category": "medium",
+                "prompt": "Build a structured 2000 meter session with warmup, main set of mixed freestyle and backstroke intervals, and cooldown",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session structured2000m {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    8 x swim 100 m freestyle hard pace 80 rest 15 s\n    4 x swim 150 m backstroke moderate pace 100 rest 25 s\n  }\n  cooldown {\n    swim 200 m easy pace 140\n  }\n}",
+                "error": null,
+                "durationMs": 11118
+            },
+            {
+                "promptId": 14,
+                "category": "medium",
+                "prompt": "Design a pyramid workout: swim 50m, 100m, 200m, 100m, 50m all freestyle at moderate intensity",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session pyramid {\n  swim 50 m freestyle moderate\n  swim 100 m freestyle moderate\n  swim 200 m freestyle moderate\n  swim 100 m freestyle moderate\n  swim 50 m freestyle moderate\n}",
+                "error": null,
+                "durationMs": 7324
+            },
+            {
+                "promptId": 15,
+                "category": "medium",
+                "prompt": "Make a 45 minute moderate training session with 400m warmup, sprint intervals in the main set, and 300m cooldown",
+                "success": true,
+                "attempts": 2,
+                "finalDsl": "session moderate45 {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    8 x swim 50 m freestyle hard rest 15 s\n  }\n  cooldown {\n    swim 300 m easy pace 140\n  }\n}",
+                "error": null,
+                "durationMs": 23364
+            },
+            {
+                "promptId": 16,
+                "category": "medium",
+                "prompt": "I need a session with 4x200m backstroke moderate with 30 seconds rest and 4x100m freestyle hard with 15 seconds rest",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session session1 {\n  4 x swim 200 m backstroke moderate rest 30 s\n  4 x swim 100 m freestyle hard rest 15 s\n}",
+                "error": null,
+                "durationMs": 6718
+            },
+            {
+                "promptId": 17,
+                "category": "medium",
+                "prompt": "Create a session starting with 500m easy warmup, then 10x50m hard freestyle with 10 seconds rest, then 200m easy cooldown",
+                "success": false,
+                "attempts": 3,
+                "finalDsl": "session training {\n  swim 500 m easy\n  10 x swim 50 m freestyle hard pace 60 rest 10 s\n  swim 200 m easy\n}",
+                "error": "Failed after 3 attempts. Last error: Parse error at line 3, column 2",
+                "durationMs": 64094
+            },
+            {
+                "promptId": 18,
+                "category": "medium",
+                "prompt": "Build a progressive distance workout: 4x50m then 4x100m then 4x200m all freestyle with 20 second rest between each set",
+                "success": true,
+                "attempts": 2,
+                "finalDsl": "session progressive {\n  4 x swim 50 m freestyle moderate rest 20 s\n  4 x swim 100 m freestyle moderate rest 20 s\n  4 x swim 200 m freestyle moderate rest 20 s\n}",
+                "error": null,
+                "durationMs": 31633
+            },
+            {
+                "promptId": 19,
+                "category": "medium",
+                "prompt": "Design a session with warmup 300m easy freestyle, main with kick intervals 6x50m hard with 15 second rest, and 200m easy cooldown",
+                "success": true,
+                "attempts": 2,
+                "finalDsl": "session standard {\n  warmup {\n    swim 300 m freestyle easy\n  }\n  main {\n    6 x kick 50 m hard rest 15 s\n  }\n  cooldown {\n    swim 200 m freestyle easy\n  }\n}",
+                "error": null,
+                "durationMs": 24790
+            },
+            {
+                "promptId": 20,
+                "category": "medium",
+                "prompt": "Make a 1 hour endurance session mostly freestyle, include a 400m warmup, a long main set of continuous swimming, and 300m cooldown",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session endurance {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    swim 1000 m freestyle moderate pace 100\n    swim 500 m backstroke moderate pace 110\n    swim 1000 m freestyle moderate pace 100\n  }\n  cooldown {\n    swim 300 m easy pace 130\n  }\n}",
+                "error": null,
+                "durationMs": 12884
+            },
+            {
+                "promptId": 21,
+                "category": "hard",
+                "prompt": "Create a technique session with warmup 400m easy freestyle, then drills: catchup 200m, fingertip 200m, sculling 4x50m with 20 second rest, and cooldown 200m easy",
+                "success": false,
+                "attempts": 3,
+                "finalDsl": "session technique {\n  swim 400 m freestyle easy\n  drill catchup 200 m\n  drill fingertip 200 m\n  4 x drill sculling 50 m rest 20 s\n  swim 200 m easy\n}",
+                "error": "Failed after 3 attempts. Last error: Parse error at line 7, column 0",
+                "durationMs": 69623
+            },
+            {
+                "promptId": 22,
+                "category": "hard",
+                "prompt": "Build a session using fins for the warmup 300m easy, paddles for main set 6x100m freestyle hard with 15 second rest, and pullbuoy for cooldown 200m easy",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session equipment_focus {\n  warmup {\n    swim 300 m freestyle easy with fins\n  }\n  main {\n    6 x swim 100 m freestyle hard with paddles rest 15 s\n  }\n  cooldown {\n    swim 200 m freestyle easy with pullbuoy\n  }\n}",
+                "error": null,
+                "durationMs": 8251
+            },
+            {
+                "promptId": 23,
+                "category": "hard",
+                "prompt": "Design a session with target times: warmup 400m freestyle easy, main 8x100m freestyle hard pace 75 with target 1:15 and 15 second rest, cooldown 200m easy",
+                "success": false,
+                "attempts": 3,
+                "finalDsl": "session targetsession {\n  warmup {\n    swim 400 m freestyle easy\n  }\n  main {\n    8 x swim 100 m freestyle hard pace 75 rest 15 s\n  }\n  cooldown {\n    swim 200 m easy\n  }\n}",
+                "error": "Failed after 3 attempts. Last error: Parse error at line 10, column 2",
+                "durationMs": 60711
+            },
+            {
+                "promptId": 24,
+                "category": "hard",
+                "prompt": "I want a mixed session: 400m warmup easy freestyle, 4x100m freestyle hard rest 15s, 4x50m kick hard with board rest 10s, drill onesided 200m moderate, 200m cooldown easy",
+                "success": true,
+                "attempts": 2,
+                "finalDsl": "session mixed {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    4 x swim 100 m freestyle hard pace 75 rest 15 s\n    4 x kick 50 m hard with board rest 10 s\n    drill onesided 200 m moderate\n  }\n  cooldown {\n    swim 200 m easy pace 140\n  }\n}",
+                "error": null,
+                "durationMs": 36378
+            },
+            {
+                "promptId": 25,
+                "category": "hard",
+                "prompt": "Create a complex pyramid: 50m easy, 100m moderate, 200m hard, 200m hard, 100m moderate, 50m easy all freestyle with pace and 20 second rest",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session pyramid {\n  1 x swim 50 m freestyle easy pace 120 rest 20 s\n  1 x swim 100 m freestyle moderate pace 100 rest 20 s\n  1 x swim 200 m freestyle hard pace 80 rest 20 s\n  1 x swim 200 m freestyle hard pace 80 rest 20 s\n  1 x swim 100 m freestyle moderate pace 100 rest 20 s\n  1 x swim 50 m freestyle easy pace 120 rest 20 s\n}",
+                "error": null,
+                "durationMs": 11689
+            },
+            {
+                "promptId": 26,
+                "category": "hard",
+                "prompt": "Build a 2500 meter competition preparation session with structured warmup, main set of butterfly and freestyle intervals, kick sets, and drill work in the cooldown",
+                "success": true,
+                "attempts": 2,
+                "finalDsl": "session competitionpreparation {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    4 x swim 50 m butterfly hard rest 20 s\n    6 x swim 100 m freestyle hard pace 70 rest 15 s\n    3 x swim 200 m freestyle moderate pace 100 rest 30 s\n    4 x kick 75 m hard with board rest 15 s\n  }\n  cooldown {\n    drill catchup 100 m easy\n    drill fingertip 100 m easy\n    swim 200 m freestyle easy pace 140\n  }\n}",
+                "error": null,
+                "durationMs": 30057
+            },
+            {
+                "promptId": 27,
+                "category": "hard",
+                "prompt": "Design a recovery session using snorkel for 400m easy warmup, pullbuoy for 4x100m easy backstroke rest 30s, and fins for 200m easy cooldown",
+                "success": true,
+                "attempts": 1,
+                "finalDsl": "session recovery {\n  warmup {\n    swim 400 m freestyle easy with snorkel\n  }\n  main {\n    4 x swim 100 m backstroke easy with pullbuoy rest 30 s\n  }\n  cooldown {\n    swim 200 m freestyle easy with fins\n  }\n}",
+                "error": null,
+                "durationMs": 8730
+            },
+            {
+                "promptId": 28,
+                "category": "hard",
+                "prompt": "Create a technique focused session with all five drill types: catchup, onesided, fingertip, sixKick, and sculling each 100m easy as the main set, with 400m freestyle warmup and 200m backstroke cooldown",
+                "success": true,
+                "attempts": 2,
+                "finalDsl": "session technique {\n  warmup {\n    swim 400 m freestyle easy\n  }\n  main {\n    drill catchup 100 m easy\n    drill onesided 100 m easy\n    drill fingertip 100 m easy\n    drill sixKick 100 m easy\n    drill sculling 100 m easy\n  }\n  cooldown {\n    swim 200 m backstroke easy\n  }\n}",
+                "error": null,
+                "durationMs": 20576
+            },
+            {
+                "promptId": 29,
+                "category": "hard",
+                "prompt": "Build an advanced interval session: warmup 400m easy, main has 8x100m freestyle hard pace 70 target 1:10 rest 15s with paddles, then 4x50m butterfly hard rest 20s, cooldown 300m easy with fins",
+                "success": true,
+                "attempts": 2,
+                "finalDsl": "session advancedInterval {\n  warmup {\n    swim 400 m freestyle easy\n  }\n  main {\n    8 x swim 100 m freestyle hard pace 70 with paddles target 1:10 rest 15 s\n    4 x swim 50 m butterfly hard rest 20 s\n  }\n  cooldown {\n    swim 300 m easy with fins\n  }\n}",
+                "error": null,
+                "durationMs": 35398
+            },
+            {
+                "promptId": 30,
+                "category": "hard",
+                "prompt": "I need a multi-component session: warmup with 200m easy swim and 200m kick with board, main with 6x100m breaststroke moderate pace 100 rest 20s and drill sculling 4x50m rest 15s, cooldown 200m easy with snorkel",
+                "success": false,
+                "attempts": 3,
+                "finalDsl": "session multiComponent {\n  warmup {\n    swim 200 m easy\n    kick 200 m with board\n  }\n  main {\n    6 x swim 100 m breaststroke moderate pace 100 rest 20 s\n    4 x drill sculling 50 m rest 15 s\n  }\n  cooldown {\n    swim 200 m easy with snorkel\n  }\n}",
+                "error": "Failed after 3 attempts. Last error: Parse error at line 4, column 4",
+                "durationMs": 48188
+            }
+        ]
+    },
+    "experimentB": {
+        "metrics": {
+            "totalPrompts": 30,
+            "endToEndSuccesses": 30,
+            "endToEndRate": 100.0,
+            "resolvedByTranslator": 26,
+            "translatorRate": 86.66666666666667,
+            "resolvedByOptimizer": 2,
+            "optimizerRate": 6.666666666666667,
+            "resolvedByFallback": 2,
+            "fallbackRate": 6.666666666666667,
+            "improvementOverA": 13.333333333333329
+        },
+        "results": [
+            {
+                "promptId": 1,
+                "category": "simple",
+                "prompt": "Create a 500 meter freestyle easy session",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session easyFreestyle {\n  swim 500 m freestyle easy\n}",
+                "error": null,
+                "durationMs": 7313
+            },
+            {
+                "promptId": 2,
+                "category": "simple",
+                "prompt": "I want a 400 meter backstroke workout at moderate intensity",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session workout {\n  swim 400 m backstroke moderate\n}",
+                "error": null,
+                "durationMs": 6487
+            },
+            {
+                "promptId": 3,
+                "category": "simple",
+                "prompt": "Make a simple 800 meter breaststroke session",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session breaststroke800 {\n  swim 200 m breaststroke easy\n  4 x swim 100 m breaststroke moderate rest 20 s\n  swim 200 m breaststroke easy\n}",
+                "error": null,
+                "durationMs": 7759
+            },
+            {
+                "promptId": 4,
+                "category": "simple",
+                "prompt": "Generate a 200 meter butterfly hard sprint session",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session butterflySprint {\n  swim 200 m butterfly hard\n}",
+                "error": null,
+                "durationMs": 7766
+            },
+            {
+                "promptId": 5,
+                "category": "simple",
+                "prompt": "I need a 600 meter easy kick workout",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session kickworkout {\n  kick 600 m easy\n}",
+                "error": null,
+                "durationMs": 6723
+            },
+            {
+                "promptId": 6,
+                "category": "simple",
+                "prompt": "Create a 1000 meter freestyle session at moderate pace of 110 seconds per 100m",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session freestyle {\n  swim 1000 m freestyle moderate pace 110\n}",
+                "error": null,
+                "durationMs": 8331
+            },
+            {
+                "promptId": 7,
+                "category": "simple",
+                "prompt": "Build me a 300 meter backstroke easy warmup session",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session warmup {\n  swim 300 m backstroke easy\n}",
+                "error": null,
+                "durationMs": 7008
+            },
+            {
+                "promptId": 8,
+                "category": "simple",
+                "prompt": "I want a short 400 meter easy swim session",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session shortSwim {\n  swim 400 m freestyle easy pace 120\n}",
+                "error": null,
+                "durationMs": 6931
+            },
+            {
+                "promptId": 9,
+                "category": "simple",
+                "prompt": "Make a 500 meter hard freestyle session with pace 80",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session session1 {\n  swim 500 m freestyle hard pace 80\n}",
+                "error": null,
+                "durationMs": 7073
+            },
+            {
+                "promptId": 10,
+                "category": "simple",
+                "prompt": "Give me a 1000 meter easy endurance swim in freestyle",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session endurance {\n  swim 1000 m freestyle easy\n}",
+                "error": null,
+                "durationMs": 7500
+            },
+            {
+                "promptId": 11,
+                "category": "medium",
+                "prompt": "Create a 1500 meter session with warmup of 400m easy freestyle, main set of 8x100m freestyle hard with 15 second rest, and 200m easy cooldown",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 2,
+                "finalDsl": "session session1500 {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    8 x swim 100 m freestyle hard pace 90 rest 15 s\n  }\n  cooldown {\n    swim 200 m easy pace 120\n  }\n}",
+                "error": null,
+                "durationMs": 20663
+            },
+            {
+                "promptId": 12,
+                "category": "medium",
+                "prompt": "I want interval training: 6 times 100 meter freestyle hard with 20 seconds rest, then finish with 200m easy backstroke",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session intervaltraining {\n  6 x swim 100 m freestyle hard rest 20 s\n  swim 200 m backstroke easy\n}",
+                "error": null,
+                "durationMs": 6749
+            },
+            {
+                "promptId": 13,
+                "category": "medium",
+                "prompt": "Build a structured 2000 meter session with warmup, main set of mixed freestyle and backstroke intervals, and cooldown",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session structured2000m {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    8 x swim 100 m freestyle hard pace 80 rest 15 s\n    4 x swim 150 m backstroke moderate pace 100 rest 25 s\n  }\n  cooldown {\n    swim 200 m easy pace 140\n  }\n}",
+                "error": null,
+                "durationMs": 11118
+            },
+            {
+                "promptId": 14,
+                "category": "medium",
+                "prompt": "Design a pyramid workout: swim 50m, 100m, 200m, 100m, 50m all freestyle at moderate intensity",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session pyramid {\n  swim 50 m freestyle moderate\n  swim 100 m freestyle moderate\n  swim 200 m freestyle moderate\n  swim 100 m freestyle moderate\n  swim 50 m freestyle moderate\n}",
+                "error": null,
+                "durationMs": 7324
+            },
+            {
+                "promptId": 15,
+                "category": "medium",
+                "prompt": "Make a 45 minute moderate training session with 400m warmup, sprint intervals in the main set, and 300m cooldown",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 2,
+                "finalDsl": "session moderate45 {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    8 x swim 50 m freestyle hard rest 15 s\n  }\n  cooldown {\n    swim 300 m easy pace 140\n  }\n}",
+                "error": null,
+                "durationMs": 23364
+            },
+            {
+                "promptId": 16,
+                "category": "medium",
+                "prompt": "I need a session with 4x200m backstroke moderate with 30 seconds rest and 4x100m freestyle hard with 15 seconds rest",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session session1 {\n  4 x swim 200 m backstroke moderate rest 30 s\n  4 x swim 100 m freestyle hard rest 15 s\n}",
+                "error": null,
+                "durationMs": 6718
+            },
+            {
+                "promptId": 17,
+                "category": "medium",
+                "prompt": "Create a session starting with 500m easy warmup, then 10x50m hard freestyle with 10 seconds rest, then 200m easy cooldown",
+                "success": true,
+                "resolvedBy": "fallback",
+                "translatorAttempts": 3,
+                "finalDsl": "session generated_endurance {\n  warmup {\n    swim 75 m easy pace 120\n  }\n  main {\n    2 x swim 175 m freestyle moderate pace 100 rest 30 s\n  }\n  cooldown {\n    swim 75 m easy pace 130\n  }\n}",
+                "error": null,
+                "durationMs": 76623
+            },
+            {
+                "promptId": 18,
+                "category": "medium",
+                "prompt": "Build a progressive distance workout: 4x50m then 4x100m then 4x200m all freestyle with 20 second rest between each set",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 2,
+                "finalDsl": "session progressive {\n  4 x swim 50 m freestyle moderate rest 20 s\n  4 x swim 100 m freestyle moderate rest 20 s\n  4 x swim 200 m freestyle moderate rest 20 s\n}",
+                "error": null,
+                "durationMs": 31633
+            },
+            {
+                "promptId": 19,
+                "category": "medium",
+                "prompt": "Design a session with warmup 300m easy freestyle, main with kick intervals 6x50m hard with 15 second rest, and 200m easy cooldown",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 2,
+                "finalDsl": "session standard {\n  warmup {\n    swim 300 m freestyle easy\n  }\n  main {\n    6 x kick 50 m hard rest 15 s\n  }\n  cooldown {\n    swim 200 m freestyle easy\n  }\n}",
+                "error": null,
+                "durationMs": 24790
+            },
+            {
+                "promptId": 20,
+                "category": "medium",
+                "prompt": "Make a 1 hour endurance session mostly freestyle, include a 400m warmup, a long main set of continuous swimming, and 300m cooldown",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session endurance {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    swim 1000 m freestyle moderate pace 100\n    swim 500 m backstroke moderate pace 110\n    swim 1000 m freestyle moderate pace 100\n  }\n  cooldown {\n    swim 300 m easy pace 130\n  }\n}",
+                "error": null,
+                "durationMs": 12884
+            },
+            {
+                "promptId": 21,
+                "category": "hard",
+                "prompt": "Create a technique session with warmup 400m easy freestyle, then drills: catchup 200m, fingertip 200m, sculling 4x50m with 20 second rest, and cooldown 200m easy",
+                "success": true,
+                "resolvedBy": "fallback",
+                "translatorAttempts": 3,
+                "finalDsl": "session generated_technique {\n  warmup {\n    swim 100 m easy pace 120\n  }\n  main {\n    3 x drill catchup 22 m easy rest 20 s\n    3 x drill fingertip 22 m easy rest 20 s\n    3 x drill sculling 22 m easy rest 20 s\n  }\n  cooldown {\n    swim 100 m easy pace 130\n  }\n}",
+                "error": null,
+                "durationMs": 82725
+            },
+            {
+                "promptId": 22,
+                "category": "hard",
+                "prompt": "Build a session using fins for the warmup 300m easy, paddles for main set 6x100m freestyle hard with 15 second rest, and pullbuoy for cooldown 200m easy",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session equipment_focus {\n  warmup {\n    swim 300 m freestyle easy with fins\n  }\n  main {\n    6 x swim 100 m freestyle hard with paddles rest 15 s\n  }\n  cooldown {\n    swim 200 m freestyle easy with pullbuoy\n  }\n}",
+                "error": null,
+                "durationMs": 8251
+            },
+            {
+                "promptId": 23,
+                "category": "hard",
+                "prompt": "Design a session with target times: warmup 400m freestyle easy, main 8x100m freestyle hard pace 75 with target 1:15 and 15 second rest, cooldown 200m easy",
+                "success": true,
+                "resolvedBy": "optimizer",
+                "translatorAttempts": 3,
+                "finalDsl": "session MySession {\n  warmup {\n    swim 400m freestyle easy\n  }\n  main {\n    8 x swim 100m freestyle hard pace 75 target 1:15 rest 15s\n  }\n  cooldown {\n    swim 200m freestyle easy\n  }\n}",
+                "error": null,
+                "durationMs": 73518
+            },
+            {
+                "promptId": 24,
+                "category": "hard",
+                "prompt": "I want a mixed session: 400m warmup easy freestyle, 4x100m freestyle hard rest 15s, 4x50m kick hard with board rest 10s, drill onesided 200m moderate, 200m cooldown easy",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 2,
+                "finalDsl": "session mixed {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    4 x swim 100 m freestyle hard pace 75 rest 15 s\n    4 x kick 50 m hard with board rest 10 s\n    drill onesided 200 m moderate\n  }\n  cooldown {\n    swim 200 m easy pace 140\n  }\n}",
+                "error": null,
+                "durationMs": 36378
+            },
+            {
+                "promptId": 25,
+                "category": "hard",
+                "prompt": "Create a complex pyramid: 50m easy, 100m moderate, 200m hard, 200m hard, 100m moderate, 50m easy all freestyle with pace and 20 second rest",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session pyramid {\n  1 x swim 50 m freestyle easy pace 120 rest 20 s\n  1 x swim 100 m freestyle moderate pace 100 rest 20 s\n  1 x swim 200 m freestyle hard pace 80 rest 20 s\n  1 x swim 200 m freestyle hard pace 80 rest 20 s\n  1 x swim 100 m freestyle moderate pace 100 rest 20 s\n  1 x swim 50 m freestyle easy pace 120 rest 20 s\n}",
+                "error": null,
+                "durationMs": 11689
+            },
+            {
+                "promptId": 26,
+                "category": "hard",
+                "prompt": "Build a 2500 meter competition preparation session with structured warmup, main set of butterfly and freestyle intervals, kick sets, and drill work in the cooldown",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 2,
+                "finalDsl": "session competitionpreparation {\n  warmup {\n    swim 400 m freestyle easy pace 120\n  }\n  main {\n    4 x swim 50 m butterfly hard rest 20 s\n    6 x swim 100 m freestyle hard pace 70 rest 15 s\n    3 x swim 200 m freestyle moderate pace 100 rest 30 s\n    4 x kick 75 m hard with board rest 15 s\n  }\n  cooldown {\n    drill catchup 100 m easy\n    drill fingertip 100 m easy\n    swim 200 m freestyle easy pace 140\n  }\n}",
+                "error": null,
+                "durationMs": 30057
+            },
+            {
+                "promptId": 27,
+                "category": "hard",
+                "prompt": "Design a recovery session using snorkel for 400m easy warmup, pullbuoy for 4x100m easy backstroke rest 30s, and fins for 200m easy cooldown",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 1,
+                "finalDsl": "session recovery {\n  warmup {\n    swim 400 m freestyle easy with snorkel\n  }\n  main {\n    4 x swim 100 m backstroke easy with pullbuoy rest 30 s\n  }\n  cooldown {\n    swim 200 m freestyle easy with fins\n  }\n}",
+                "error": null,
+                "durationMs": 8730
+            },
+            {
+                "promptId": 28,
+                "category": "hard",
+                "prompt": "Create a technique focused session with all five drill types: catchup, onesided, fingertip, sixKick, and sculling each 100m easy as the main set, with 400m freestyle warmup and 200m backstroke cooldown",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 2,
+                "finalDsl": "session technique {\n  warmup {\n    swim 400 m freestyle easy\n  }\n  main {\n    drill catchup 100 m easy\n    drill onesided 100 m easy\n    drill fingertip 100 m easy\n    drill sixKick 100 m easy\n    drill sculling 100 m easy\n  }\n  cooldown {\n    swim 200 m backstroke easy\n  }\n}",
+                "error": null,
+                "durationMs": 20576
+            },
+            {
+                "promptId": 29,
+                "category": "hard",
+                "prompt": "Build an advanced interval session: warmup 400m easy, main has 8x100m freestyle hard pace 70 target 1:10 rest 15s with paddles, then 4x50m butterfly hard rest 20s, cooldown 300m easy with fins",
+                "success": true,
+                "resolvedBy": "translator",
+                "translatorAttempts": 2,
+                "finalDsl": "session advancedInterval {\n  warmup {\n    swim 400 m freestyle easy\n  }\n  main {\n    8 x swim 100 m freestyle hard pace 70 with paddles target 1:10 rest 15 s\n    4 x swim 50 m butterfly hard rest 20 s\n  }\n  cooldown {\n    swim 300 m easy with fins\n  }\n}",
+                "error": null,
+                "durationMs": 35398
+            },
+            {
+                "promptId": 30,
+                "category": "hard",
+                "prompt": "I need a multi-component session: warmup with 200m easy swim and 200m kick with board, main with 6x100m breaststroke moderate pace 100 rest 20s and drill sculling 4x50m rest 15s, cooldown 200m easy with snorkel",
+                "success": true,
+                "resolvedBy": "optimizer",
+                "translatorAttempts": 3,
+                "finalDsl": "session multicomponent {\n  warmup {\n    swim 200m freestyle easy\n    kick 200m with board\n  }\n  main {\n    6 x swim 100m breaststroke moderate pace 100 rest 20s\n    4 x drill sculling 50m rest 15s\n  }\n  cooldown {\n    swim 200m freestyle easy with snorkel\n  }\n}",
+                "error": null,
+                "durationMs": 61706
+            }
+        ]
+    }
+}
