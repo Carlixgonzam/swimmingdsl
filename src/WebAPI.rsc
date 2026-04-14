@@ -10,7 +10,6 @@ import SwimSyntax;
 import AST;
 import Semantics;
 
-// Convert analysis to JSON string
 str toJSON(value v) {
   switch(v) {
     case str s: return "\"<escape(s, ("\"": "\\\"", "\\": "\\\\", "\n": "\\n", "\r": "\\r", "\t": "\\t"))>\"";
@@ -37,31 +36,22 @@ str toJSON(value v) {
   }
 }
 
-// Analyze and return JSON
 str analyzeToJSON(str input) {
   try {
     Tree tree = parse(#start[Program], input);
-    
-    // Parse to AST would require implementing implode or manually converting
-    // For now, we'll do text-based analysis like Main.rsc does
-    
     map[str, value] result = ();
     result["success"] = true;
-    
-    // Count sessions
+    //aca cuento las sesioens
     list[str] sessionNames = [];
     for (/session\s+<name:[a-zA-Z][a-zA-Z0-9_]*>/ := input) {
       sessionNames += name;
     }
     result["sessionCount"] = size(sessionNames);
     result["sessionNames"] = sessionNames;
-    
-    // Calculate distance
     int totalDist = 0;
     for (/<d:[0-9]+>\s*m/ := input) {
       totalDist += toInt(d);
     }
-    // Match intervals: "N x swim D m" (swim/kick = 1 word before distance)
     for (/<reps:[0-9]+>\s*x\s*\w+\s*<d:[0-9]+>\s*m/ := input) {
       totalDist += ((toInt(reps) - 1) * toInt(d));
     }
@@ -69,7 +59,7 @@ str analyzeToJSON(str input) {
     result["totalDistance"] = totalDist;
     result["distanceKm"] = round(totalDist / 1000.0, 0.01);
     
-    // Count styles
+    
     map[str, int] styleCount = ();
     if (/freestyle/ := input) styleCount["freestyle"] = size([1 | /freestyle/ := input]);
     if (/backstroke/ := input) styleCount["backstroke"] = size([1 | /backstroke/ := input]);
@@ -77,14 +67,14 @@ str analyzeToJSON(str input) {
     if (/butterfly/ := input) styleCount["butterfly"] = size([1 | /butterfly/ := input]);
     result["styles"] = styleCount;
     
-    // Count intensities
+
     map[str, int] intensityCount = ();
     if (/easy/ := input) intensityCount["easy"] = size([1 | /easy/ := input]);
     if (/moderate/ := input) intensityCount["moderate"] = size([1 | /moderate/ := input]);
     if (/hard/ := input) intensityCount["hard"] = size([1 | /hard/ := input]);
     result["intensities"] = intensityCount;
     
-    // Count equipment
+    
     map[str, int] equipmentCount = ();
     if (/with\s+fins/ := input) equipmentCount["fins"] = size([1 | /with\s+fins/ := input]);
     if (/with\s+paddles/ := input) equipmentCount["paddles"] = size([1 | /with\s+paddles/ := input]);
@@ -93,7 +83,7 @@ str analyzeToJSON(str input) {
     if (/with\s+snorkel/ := input) equipmentCount["snorkel"] = size([1 | /with\s+snorkel/ := input]);
     result["equipment"] = equipmentCount;
     
-    // Count drills
+
     map[str, int] drillCount = ();
     if (/drill\s+catchup/ := input) drillCount["catchup"] = size([1 | /drill\s+catchup/ := input]);
     if (/drill\s+onesided/ := input) drillCount["onesided"] = size([1 | /drill\s+onesided/ := input]);
@@ -102,7 +92,7 @@ str analyzeToJSON(str input) {
     if (/drill\s+sculling/ := input) drillCount["sculling"] = size([1 | /drill\s+sculling/ := input]);
     result["drills"] = drillCount;
     
-    // Rest analysis
+    
     int totalRest = 0;
     int restCount = 0;
     for (/rest\s+<seconds:[0-9]+>\s*s/ := input) {
@@ -115,8 +105,6 @@ str analyzeToJSON(str input) {
       "average": restCount > 0 ? totalRest / restCount : 0
     );
     result["rest"] = restInfo;
-    
-    // Time estimation
     int totalTime = 0;
     int paceCount = 0;
     for (/<d:[0-9]+>\s*m.*?pace\s+<p:[0-9]+>/ := input) {
@@ -150,10 +138,8 @@ str analyzeToJSON(str input) {
   }
 }
 
-// Generate session and return DSL code
 str generateToJSON(str goal, int distance, list[str] styles, int duration) {
   try {
-    // Convert strings to Goal and Style types
     Goal g = endurance();
     switch(goal) {
       case "speed": g = speed();
@@ -175,8 +161,6 @@ str generateToJSON(str goal, int distance, list[str] styles, int duration) {
     
     GeneratorConfig config = generatorConfig(g, distance, styleList, duration);
     Session session = generateSession(config);
-    
-    // Convert session to DSL code
     str dslCode = sessionToDSL(session);
     
     map[str, value] result = (
@@ -197,7 +181,7 @@ str generateToJSON(str goal, int distance, list[str] styles, int duration) {
   }
 }
 
-// Convert Session AST to DSL code
+
 str sessionToDSL(Session session) {
   str code = "";
   switch(session) {
@@ -385,7 +369,6 @@ str targetToStr(Target t) {
   }
 }
 
-// CLI interface
 void main(list[str] args) {
   if (size(args) < 1) {
     println("{\"success\":false,\"error\":\"No command provided\"}");
