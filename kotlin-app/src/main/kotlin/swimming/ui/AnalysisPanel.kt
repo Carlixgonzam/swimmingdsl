@@ -253,7 +253,6 @@ private fun AnalysisContent(result: AnalysisResult) {
         // Time breakdown
         AnalysisSection("Tiempo") {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("🏊 Nado: ${result.time.swimFormatted}", fontSize = 14.sp, color = TextColor)
                 Text("⏸ Descanso: ${result.time.restFormatted}", fontSize = 14.sp, color = TextColor)
             }
         }

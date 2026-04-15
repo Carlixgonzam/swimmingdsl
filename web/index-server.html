@@ -463,20 +463,108 @@
       font-size: 14px;
     }
 
-    /* Line numbers */
-    .line-numbers {
-      position: absolute;
-      left: 0;
-      top: 15px;
-      padding-right: 10px;
-      text-align: right;
-      color: #858585;
-      user-select: none;
-      pointer-events: none;
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+    /* Top-level navigation */
+    .main-nav {
+      display: flex;
+      gap: 0;
+      background: white;
+      border-bottom: 2px solid var(--border);
+      padding: 0 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+    .main-nav button {
+      padding: 14px 24px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .main-nav button.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .main-nav button:hover:not(.active) {
+      color: var(--text);
+    }
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* Chat styles */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 500px;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chat-msg {
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 85%;
       font-size: 14px;
       line-height: 1.5;
+      white-space: pre-wrap;
     }
+    .chat-msg.user {
+      background: var(--primary);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-msg.assistant {
+      background: var(--bg);
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .chat-input-row input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    /* Translator output */
+    .dsl-output {
+      background: #2d2d2d;
+      color: #d4d4d4;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .attempt-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .attempt-1 { background: #e8f5e9; color: #2e7d32; }
+    .attempt-2 { background: #fff3e0; color: #ef6c00; }
+    .attempt-3 { background: #ffebee; color: #c62828; }
   </style>
 </head>
 <body>
@@ -484,15 +572,25 @@
     <div class="container">
       <h1>
         🏊‍♀️ Swimming DSL
-        <span class="badge">Server Mode - powered by Rascal</span>
+        <span class="badge">Web · Rascal + IA</span>
       </h1>
       <p>Programa y analiza sesiones de entrenamiento de natación</p>
     </div>
   </header>
 
+  <!-- Top-level navigation matching Kotlin app tabs -->
+  <nav class="main-nav">
+    <button class="active" onclick="switchPanel('editor')">Editor</button>
+    <button onclick="switchPanel('translator')">Traductor IA</button>
+    <button onclick="switchPanel('coach')">Coach IA</button>
+    <button onclick="switchPanel('optimizer')">Optimizador IA</button>
+  </nav>
+
   <div class="container">
+
+    <!-- ═══ PANEL 1: EDITOR ═══ -->
+    <div id="panel-editor" class="panel active">
     <div class="main-grid">
-      <!-- Editor Panel -->
       <div class="card">
         <div class="card-header">
           <span>Editor</span>
@@ -570,11 +668,9 @@
         </div>
       </div>
 
-      <!-- Output Panel -->
+      <!-- Analysis Output -->
       <div class="card">
-        <div class="card-header">
-          <span>Análisis</span>
-        </div>
+        <div class="card-header"><span>Análisis</span></div>
         <div class="card-body">
           <div id="analysis-output">
             <p style="color: var(--text-light); text-align: center; padding: 40px;">
@@ -584,7 +680,103 @@
         </div>
       </div>
     </div>
-  </div>
+    </div>
+
+    <!-- ═══ PANEL 2: TRANSLATOR ═══ -->
+    <div id="panel-translator" class="panel">
+    <div class="main-grid">
+      <div class="card">
+        <div class="card-header"><span>Traductor IA</span></div>
+        <div class="card-body">
+          <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">
+            Describe una sesión de natación en lenguaje natural y el sistema generará código DSL válido.
+          </p>
+          <textarea id="translate-input" rows="4" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; font-size:14px; resize:vertical;" placeholder="Ej: Sesión de 2000m con calentamiento de 400m freestyle, intervalos 8x100m hard con 15s descanso, y vuelta a la calma 200m..."></textarea>
+          <div class="btn-group">
+            <button class="btn btn-primary" id="translateBtn" onclick="translatePrompt()">⚡ Generar DSL</button>
+          </div>
+          <div id="translate-output" style="margin-top:15px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span>Análisis del DSL Generado</span></div>
+        <div class="card-body">
+          <div id="translate-analysis">
+            <p style="color: var(--text-light); text-align: center; padding: 40px;">El análisis aparecerá aquí cuando se genere DSL válido</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ═══ PANEL 3: COACH ═══ -->
+    <div id="panel-coach" class="panel">
+    <div class="main-grid">
+      <div class="card">
+        <div class="card-header">
+          <span>Coach IA</span>
+          <button class="btn btn-secondary" style="padding:5px 12px; font-size:12px;" onclick="resetCoach()">Nueva conversación</button>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px; color:var(--text-light); margin-bottom:8px;">Conversa con tu entrenador virtual sobre la sesión actual.</p>
+          <div class="chat-container">
+            <div class="chat-messages" id="coach-messages">
+              <div class="chat-msg assistant">Hola! Soy tu entrenador de natación. Puedes preguntarme sobre tu sesión actual, pedir consejos o sugerencias de mejora.</div>
+            </div>
+            <div class="chat-input-row">
+              <input type="text" id="coach-input" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter')sendCoachMessage()">
+              <button class="btn btn-primary" onclick="sendCoachMessage()">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span>Sesión Actual</span></div>
+        <div class="card-body">
+          <div id="coach-session-info">
+            <p style="color: var(--text-light); text-align: center; padding: 40px;">Analiza una sesión en el Editor primero para dar contexto al Coach</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ═══ PANEL 4: OPTIMIZER ═══ -->
+    <div id="panel-optimizer" class="panel">
+    <div class="main-grid">
+      <div class="card">
+        <div class="card-header"><span>Optimizador IA</span></div>
+        <div class="card-body">
+          <p style="font-size:13px; color:var(--text-light); margin-bottom:12px;">Optimiza una sesión DSL existente según un objetivo de entrenamiento.</p>
+          <div class="form-group" style="margin-bottom:10px;">
+            <label>Objetivo</label>
+            <select id="opt-goal" style="padding:8px; border:1px solid var(--border); border-radius:6px; width:100%;">
+              <option value="endurance">Resistencia</option>
+              <option value="speed">Velocidad</option>
+              <option value="technique">Técnica</option>
+              <option value="recovery">Recuperación</option>
+            </select>
+          </div>
+          <textarea id="opt-input" rows="8" style="width:100%; padding:12px; border:1px solid var(--border); border-radius:8px; font-family:Monaco,Menlo,monospace; font-size:13px; resize:vertical;" placeholder="Pega aquí el código DSL a optimizar..."></textarea>
+          <div class="btn-group">
+            <button class="btn btn-primary" id="optimizeBtn" onclick="optimizeCode()">🚀 Optimizar</button>
+            <button class="btn btn-secondary" onclick="document.getElementById('opt-input').value=document.getElementById('editor').value">Copiar desde Editor</button>
+          </div>
+          <div id="optimize-output" style="margin-top:15px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span>Análisis de la Sesión Optimizada</span></div>
+        <div class="card-body">
+          <div id="optimize-analysis">
+            <p style="color: var(--text-light); text-align: center; padding: 40px;">El análisis aparecerá aquí después de optimizar</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+  </div><!-- /container -->
 
   <footer>
     <p>Swimming DSL - Creado por Carla González Mina</p>
@@ -780,6 +972,7 @@
           return;
         }
 
+        lastAnalysisResult = result;  // save for coach
         output.innerHTML = `
           <div class="success-message" style="margin-bottom: 20px;">
             ✓ Análisis completado con Rascal
@@ -957,7 +1150,6 @@
         <div class="analysis-section">
           <h3>Tiempo</h3>
           <div style="font-size: 14px;">
-            <div>🏊 Nado: ${analysis.time.swimFormatted}</div>
             <div>⏸️ Descanso: ${analysis.time.restFormatted}</div>
           </div>
         </div>
@@ -965,6 +1157,181 @@
 
       return html;
     }
+
+    // ═══ Shared state ═══
+    let lastAnalysisResult = null;
+    let lastCode = null;
+    const coachSessionId = 'web-' + Date.now();
+
+    // ═══ Panel switching ═══
+    function switchPanel(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.main-nav button').forEach(b => b.classList.remove('active'));
+      document.getElementById('panel-' + name).classList.add('active');
+      event.target.classList.add('active');
+      // Update coach context when switching to coach tab
+      if (name === 'coach' && lastAnalysisResult) {
+        document.getElementById('coach-session-info').innerHTML = renderAnalysis(lastAnalysisResult);
+      }
+    }
+
+    // ═══ TRANSLATOR ═══
+    async function translatePrompt() {
+      const prompt = document.getElementById('translate-input').value.trim();
+      if (!prompt) return;
+      const output = document.getElementById('translate-output');
+      const analysis = document.getElementById('translate-analysis');
+      const btn = document.getElementById('translateBtn');
+
+      btn.disabled = true;
+      output.innerHTML = '<div class="loading"><div class="spinner"></div><p>Generando DSL con IA + validaci\u00f3n Rascal...</p></div>';
+      analysis.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/translate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt })
+        });
+        const result = await res.json();
+
+        const attemptClass = `attempt-${Math.min(result.attempts, 3)}`;
+        if (result.success) {
+          output.innerHTML = `
+            <div class="success-message" style="margin-bottom:12px;">
+              \u2713 DSL generado exitosamente
+              <span class="attempt-badge ${attemptClass}" style="margin-left:8px;">${result.attempts} intento${result.attempts > 1 ? 's' : ''}</span>
+            </div>
+            <div class="dsl-output">${escapeHtml(result.dslCode)}</div>
+            <div class="btn-group" style="margin-top:10px;">
+              <button class="btn btn-secondary" onclick="document.getElementById('editor').value=document.getElementById('translate-output').querySelector('.dsl-output').textContent; updateHighlighting(); switchPanel('editor'); document.querySelector('.main-nav button').click();">Cargar en Editor</button>
+            </div>`;
+          if (result.analysis) {
+            analysis.innerHTML = renderAnalysis(result.analysis);
+          } else {
+            analysis.innerHTML = '<div class="success-message">DSL v\u00e1lido (sin an\u00e1lisis detallado)</div>';
+          }
+        } else {
+          output.innerHTML = `
+            <div class="error-message">
+              <strong>Error:</strong> ${result.error}
+              <span class="attempt-badge ${attemptClass}" style="margin-left:8px;">${result.attempts} intento${result.attempts > 1 ? 's' : ''}</span>
+            </div>
+            ${result.dslCode ? '<div class="dsl-output" style="margin-top:10px;">' + escapeHtml(result.dslCode) + '</div>' : ''}`;
+          analysis.innerHTML = '<p style="color:var(--text-light); text-align:center; padding:40px;">No se gener\u00f3 DSL v\u00e1lido</p>';
+        }
+      } catch (error) {
+        output.innerHTML = `<div class="error-message">Error de comunicaci\u00f3n: ${error.message}</div>`;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ═══ COACH ═══
+    async function sendCoachMessage() {
+      const input = document.getElementById('coach-input');
+      const msg = input.value.trim();
+      if (!msg) return;
+      input.value = '';
+
+      const messagesDiv = document.getElementById('coach-messages');
+      messagesDiv.innerHTML += `<div class="chat-msg user">${escapeHtml(msg)}</div>`;
+      messagesDiv.innerHTML += '<div class="chat-msg assistant" id="coach-typing" style="opacity:0.6;">Pensando...</div>';
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/coach`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: coachSessionId,
+            message: msg,
+            analysisResult: lastAnalysisResult,
+            currentCode: lastCode || document.getElementById('editor').value
+          })
+        });
+        const result = await res.json();
+        const typing = document.getElementById('coach-typing');
+        if (typing) {
+          typing.id = '';
+          typing.style.opacity = '1';
+          typing.textContent = result.success ? result.response : ('Error: ' + result.error);
+        }
+      } catch (error) {
+        const typing = document.getElementById('coach-typing');
+        if (typing) { typing.id = ''; typing.style.opacity = '1'; typing.textContent = 'Error de conexi\u00f3n: ' + error.message; }
+      }
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    function resetCoach() {
+      fetch(`${API_BASE}/api/coach/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: coachSessionId })
+      });
+      document.getElementById('coach-messages').innerHTML =
+        '<div class="chat-msg assistant">Hola! Soy tu entrenador de nataci\u00f3n. Puedes preguntarme sobre tu sesi\u00f3n actual, pedir consejos o sugerencias de mejora.</div>';
+    }
+
+    // ═══ OPTIMIZER ═══
+    async function optimizeCode() {
+      const code = document.getElementById('opt-input').value.trim();
+      if (!code) return;
+      const goal = document.getElementById('opt-goal').value;
+      const output = document.getElementById('optimize-output');
+      const analysis = document.getElementById('optimize-analysis');
+      const btn = document.getElementById('optimizeBtn');
+
+      btn.disabled = true;
+      output.innerHTML = '<div class="loading"><div class="spinner"></div><p>Optimizando con IA...</p></div>';
+      analysis.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/optimize`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code, goal })
+        });
+        const result = await res.json();
+
+        if (result.success) {
+          const methodLabel = result.method === 'rascal_fallback' ? 'Generador Rascal (fallback)' : 'Optimizaci\u00f3n IA';
+          output.innerHTML = `
+            <div class="success-message" style="margin-bottom:12px;">
+              \u2713 Sesi\u00f3n optimizada via ${methodLabel}
+            </div>
+            <div class="dsl-output">${escapeHtml(result.code)}</div>
+            <div class="btn-group" style="margin-top:10px;">
+              <button class="btn btn-secondary" onclick="document.getElementById('editor').value=document.getElementById('optimize-output').querySelector('.dsl-output').textContent; updateHighlighting();">Cargar en Editor</button>
+            </div>`;
+          if (result.analysis) {
+            analysis.innerHTML = renderAnalysis(result.analysis);
+          }
+        } else {
+          output.innerHTML = `<div class="error-message"><strong>Error:</strong> ${result.error}</div>`;
+          analysis.innerHTML = '<p style="color:var(--text-light); text-align:center; padding:40px;">No se pudo optimizar</p>';
+        }
+      } catch (error) {
+        output.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ═══ Patch analyzeCode to save state for coach ═══
+    const _origAnalyzeCode = analyzeCode;
+    analyzeCode = async function() {
+      await _origAnalyzeCode();
+      // After analysis, try to capture the result for coach context
+      lastCode = document.getElementById('editor').value;
+    };
 
     // Check server health on load
     window.addEventListener('load', async () => {
@@ -977,7 +1344,7 @@
         document.getElementById('analysis-output').innerHTML = `
           <div class="warning-message">
             <strong>Servidor no disponible</strong><br>
-            El servidor backend no está corriendo. Inicia el servidor con:<br>
+            El servidor backend no est\u00e1 corriendo. Inicia el servidor con:<br>
             <code style="display: block; margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 4px;">
               cd server && npm install && npm start
             </code>
