@@ -274,6 +274,4 @@ swimmingdsl/
 
 
 
-## Licencia
 
-Carla González Mina
