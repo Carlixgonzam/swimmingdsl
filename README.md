@@ -726,8 +726,5 @@ session mixed {
 - [ ] Historial de entrenamientos
 
 
-## Autora
-
-**Carla González Mina**
 
 ---
