@@ -1,121 +1,117 @@
-# Swimming DSL - Quick Start Guide
+# Swimming DSL — Quick Start Guide
 
-## un setup bien especificado
+## Setup
 
-### Paso 1: Obtener Rascal JAR
+### Step 1: Check for the Rascal runtime
 
-se necesita el archivo `rascal.jar` en el directorio raíz del proyecto.
-
-**Opción A: Descargar desde el sitio oficial**
-
-**Opción B: Si ya tienes Rascal instalado**
-
-copia tu `rascal.jar` al directorio del proyecto:
+`rascal-shell-stable.jar` should already be present at the root of the project. If it is missing, download it with:
 
 ```bash
-cp /ruta/a/tu/rascal.jar /Users/carlagonzalez/Desktop/swimmingdsl/
+curl -L -o rascal-shell-stable.jar https://update.rascal-mpl.org/console/rascal-shell-stable.jar
 ```
 
-### Paso 2: verificar javita
+### Step 2: Check your Java version
 
 ```bash
 java -version
 ```
 
-se deberia ver Java 11 o superior
+You should see Java 11 or newer.
 
-### Paso 3: instalar Node.js dependencies
+### Step 3: Install the Node.js dependencies
 
 ```bash
-cd /Users/carlagonzalez/Desktop/swimmingdsl/server
+cd server
 npm install
 ```
 
-### Paso 4: iniciar el servidor
+### Step 4: Start the server
 
 ```bash
 npm start
 ```
 
-### Paso 5: abrir en el navegador
+### Step 5: Open the app in your browser
 
-abrir http://localhost:3000
+Open http://localhost:3000
 
-## que se implementó?
+## What this sets up
 
-### 1. **WebAPI.rsc** - Rascal Backend
-- modulo Rascal que expone funciones para análisis y generación
-- exporto resultados como JSON
-- se ejecuta desde linea de comandos
+### 1. WebAPI.rsc — Rascal backend
 
-**Ubicación**: `src/WebAPI.rsc`
+- Rascal module exposing functions for analysis and generation
+- Exports results as JSON
+- Invoked from the command line
 
-**funciones principales**:
-- `analyzeToJSON(str code)` - Analiza código y retorna JSON
-- `generateToJSON(str goal, int distance, list[str] styles, int duration)` - Genera sesiones
+**Location**: `src/WebAPI.rsc`
 
-### 2. **Node.js Server**
-- servidor que actúa como puente
-- recibe peticiones HTTP del frontend
-- ejecuta Rascal vía `java -jar`
-- retorna JSON al navegador
+**Main functions**:
+- `analyzeToJSON(str code)` — analyzes code and returns JSON
+- `generateToJSON(str goal, int distance, list[str] styles, int duration)` — generates sessions
 
-**Ubicación**: `server/server.js`
+### 2. Node.js server
+
+- Acts as the bridge between the frontend and Rascal
+- Receives HTTP requests from the frontend
+- Runs Rascal via `java -jar`
+- Returns JSON to the browser
+
+**Location**: `server/server.js`
 
 **Endpoints**:
-- `GET /api/health` - Health check
-- `POST /api/analyze` - Analiza código DSL
-- `POST /api/generate` - Genera sesiones
+- `GET /api/health` — health check
+- `POST /api/analyze` — analyzes DSL code
+- `POST /api/generate` — generates sessions
 
-### 3. **Frontend** 
-- interfaz HTML/CSS/JS que se conecta al servidor
-- editor de código con syntax highlighting
-- visualización de análisis
-- formulario para generar sesiones
+### 3. Frontend
 
-**Ubicación**: `web/index-server.html`
+- HTML/CSS/JS interface that talks to the server
+- Code editor with syntax highlighting
+- Analysis visualization
+- Form for generating sessions
 
-## flujo de los datos
+**Location**: `web/index-server.html`
+
+## Data flow
 
 ```
-Usuario escribe código DSL
-    ↓
+User writes DSL code
+    down to
 Frontend (JavaScript)
-    ↓ HTTP POST /api/analyze
-Node.js Server
-    ↓ exec("java -jar rascal.jar")
-Rascal ejecuta WebAPI.rsc
-    ↓ parseea y analiza
-Rascal retorna JSON
-    ↓ stdout
-Node.js captura JSON
-    ↓ HTTP Response
-Frontend muestra resultados
+    down to  HTTP POST /api/analyze
+Node.js server
+    down to  exec("java -jar rascal-shell-stable.jar ...")
+Rascal runs WebAPI.rsc
+    down to  parses and analyzes
+Rascal returns JSON
+    down to  stdout
+Node.js captures the JSON
+    down to  HTTP response
+Frontend displays the results
 ```
 
+### Testing the Node.js server
 
-### Test del servidor Node.js
-
-Con el servidor corriendo:
+With the server running:
 
 ```bash
 # Health check
 curl http://localhost:3000/api/health
 
-# Analizar código
+# Analyze code
 curl -X POST http://localhost:3000/api/analyze \
   -H "Content-Type: application/json" \
   -d '{"code":"session test { swim 100 m easy }"}'
 ```
 
-### test del frontend
+### Testing the frontend
 
-1. abre http://localhost:3000
-2. esccribe código en el editor
-3. presiona "Analizar"
-4. se deberá ver resultados
+1. Open http://localhost:3000
+2. Write code in the editor
+3. Press "Analyze"
+4. You should see the results
 
-## Solución de Problemas
+## Troubleshooting
 
 ### "Cannot find module 'express'"
 
@@ -126,92 +122,49 @@ npm install
 
 ### "java: command not found"
 
-Instala Java 11+:
+Install Java 11+:
 - macOS: `brew install openjdk@11`
 - Ubuntu: `sudo apt install openjdk-11-jdk`
-- Windows: Descarga desde https://adoptium.net/
+- Windows: download from https://adoptium.net/
 
-### "rascal.jar not found"
-
-Descarga rascal.jar:
+### "rascal-shell-stable.jar not found"
 
 ```bash
-cd /Users/carlagonzalez/Desktop/swimmingdsl
-curl -L -o rascal.jar https://update.rascal-mpl.org/console/rascal-shell-stable.jar
+curl -L -o rascal-shell-stable.jar https://update.rascal-mpl.org/console/rascal-shell-stable.jar
 ```
 
-### "Error: EADDRINUSE" (puerto ocupado)
+Run this from the root of the project.
 
-Cambia el puerto:
+### "Error: EADDRINUSE" (port already in use)
+
+Use a different port:
 
 ```bash
 PORT=8080 npm start
 ```
 
-### rascal da error de sintaxis
+### Rascal reports a syntax error
 
-Revisa que `WebAPI.rsc` esté en `src/` y que todos los imports sean correctos.
+Check that `WebAPI.rsc` is in `src/` and that all its imports resolve correctly.
 
-## 📁 Archivos Creados
+## Files involved
 
 ```
 swimmingdsl/
-├── src/
-│   └── WebAPI.rsc              ✨ API Rascal con exports JSON
-├── server/
-│   ├── server.js               ✨ servidor Node.js Express
-│   └── package.json            ✨ dependencias npm
-├── web/
-│   ├── index-server.html       ✨ frontend que usa servidor
-│   ├── index.html              (anterior - standalone)
-│   ├── parser.js               (anterior - parser JS standalone)
-│   └── analyzer.js             (anterior - analyzer JS standalone)
-├── WEB_SERVER_SETUP.md         ✨ documentación completa
-├── QUICKSTART.md               ✨ esta guía
-└── rascal.jar                  ⚠️  NECESARIO descargar
+  src/
+    WebAPI.rsc               Rascal API with JSON exports
+  server/
+    server.js                Node.js Express server
+    package.json              npm dependencies
+  web/
+    index-server.html        frontend served by the Node.js server
+  WEB_SERVER_SETUP.md        full documentation
+  QUICKSTART.md              this guide
+  rascal-shell-stable.jar    Rascal runtime
 ```
 
-## dos Modos de Uso
+## Further reading
 
-### Modo 1: Standalone (sin servidor)
-
-**Archivo**: `web/index.html`
-
-**Ventajas**:
-- no requiere servidor
-- funciona offline
-- setup simple
-
-**Desventajas**:
-- Usa parser JS (no Rascal)
-- Puede tener diferencias
-
-**Uso**:
-```bash
-open web/index.html
-```
-
-### Modo 2: server Mode (con Rascal)
-
-**Archivo**: `web/index-server.html` (servido por server.js)
-
-**Ventajas**:
-- Usa el parser oficial de Rascal
-- Resultados 100% confiables
-- Puede extenderse con features chéveres
-
-**Uso**:
-```bash
-cd server && npm start
-# Abre http://localhost:3000
-```
-
-## mas Información
-
-- **WEB_SERVER_SETUP.md** - Documentación completa del servidor
-- **README.md** - Documentación del DSL
-- **ARCHITECTURE.md** - Arquitectura del proyecto
-
----
-
-**¿Preguntas?** Revisa WEB_SERVER_SETUP.md para documentación detallada.
+- **WEB_SERVER_SETUP.md** — full server documentation
+- **README.md** — DSL documentation
+- **ARCHITECTURE.md** — project architecture

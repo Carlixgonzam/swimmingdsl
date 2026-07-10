@@ -1,124 +1,116 @@
 # Swimming DSL — Desktop App
 
-Aplicación de escritorio para diseñar, analizar y optimizar sesiones de entrenamiento de natación usando un **lenguaje de dominio específico (DSL)** propio, parseado por **Rascal**, y potenciado por **3 agentes de IA** sobre Gemini 2.5 Flash.
+Desktop application for designing, analyzing, and optimizing swimming training sessions using a purpose-built domain-specific language, parsed by Rascal and backed by three AI agents running on Gemini 2.5 Flash.
 
----
+## Table of contents
 
-## Tabla de contenidos
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [Running the app](#running-the-app)
+- [The swimming DSL](#the-swimming-dsl)
+- [System architecture](#system-architecture)
+- [The three AI agents](#the-three-ai-agents)
+- [Core services](#core-services)
+- [Project structure](#project-structure)
+- [App screens](#app-screens)
+- [Persisted data](#persisted-data)
+- [Roadmap](#roadmap)
 
-- [Requisitos](#requisitos)
-- [Configuración](#configuración)
-- [Cómo correr](#cómo-correr)
-- [El DSL de natación](#el-dsl-de-natación)
-- [Arquitectura del sistema](#arquitectura-del-sistema)
-- [Los 3 agentes de IA](#los-3-agentes-de-ia)
-- [Servicios base](#servicios-base)
-- [Estructura del proyecto](#estructura-del-proyecto)
-- [Pantallas de la app](#pantallas-de-la-app)
+## Requirements
 
----
-
-## Requisitos
-
-| Herramienta | Versión mínima |
+| Tool | Minimum version |
 |---|---|
 | Java (JDK) | 17+ |
-| Gradle | incluido via wrapper |
-| Gemini API Key | [Obtener aquí](https://aistudio.google.com/app/apikey) |
+| Gradle | bundled via the wrapper |
+| Gemini API key | [Get one here](https://aistudio.google.com/app/apikey) |
 
-Los archivos `rascal-shell-stable.jar` y los fuentes `.rsc` deben estar en `../` relativo a `kotlin-app/` (es decir, en la raíz de `swimmingdsl/`).
+`rascal-shell-stable.jar` and the `.rsc` source files must live in `../` relative to `kotlin-app/` (that is, at the root of `swimmingdsl/`).
 
----
+## Setup
 
-## Configuración
-
-Antes de correr la app, exporta tu API key de Gemini:
+Before running the app, export your Gemini API key:
 
 ```bash
-export GEMINI_API_KEY="tu_api_key_aqui"
+export GEMINI_API_KEY="your_api_key_here"
 ```
 
-> Sin esta variable, la app arranca pero los 3 agentes de IA lanzarán error al usarse.
+Without this variable, the app starts normally, but all three AI agents will fail as soon as they are used.
 
----
-
-## Cómo correr
+## Running the app
 
 ```bash
 cd kotlin-app
 ./gradlew run
 ```
 
-O con limpieza previa:
+Or with a clean build first:
 
 ```bash
 ./gradlew clean run
 ```
 
----
+## The swimming DSL
 
-## El DSL de natación
+The DSL describes training sessions in a structured, declarative way. It is parsed by Rascal against a context-free grammar and analyzed to extract training metrics.
 
-El DSL permite describir sesiones de entrenamiento de manera estructurada. Es parseado por Rascal (gramática libre de contexto) y analizado para extraer métricas.
-
-### Estructura básica
+### Basic structure
 
 ```
-session <nombre> {
-  <bloques>
+session <name> {
+  <blocks>
 }
 ```
 
-### Con secciones estructuradas (warmup / main / cooldown)
+### With structured sections (warmup / main / cooldown)
 
 ```
-session <nombre> {
+session <name> {
   warmup {
-    <bloques>
+    <blocks>
   }
   main {
-    <bloques>
+    <blocks>
   }
   cooldown {
-    <bloques>
+    <blocks>
   }
 }
 ```
 
-### Tipos de ejercicio
+### Exercise types
 
 ```
-# Natación
-sim <distancia> m [<estilo>] [<intensidad>] [pace <número>] [with <equipamiento>] [target <min>:<seg>]
+# Swimming
+swim <distance> m [<style>] [<intensity>] [pace <number>] [with <equipment>] [target <min>:<sec>]
 
-# Pataleo
-kick <distancia> m [<intensidad>] [with <equipamiento>]
+# Kicking
+kick <distance> m [<intensity>] [with <equipment>]
 
-# Drill técnico
-drill <tipoDrill> <distancia> m [<intensidad>]
+# Technique drill
+drill <drillType> <distance> m [<intensity>]
 ```
 
-### Intervalos
+### Intervals
 
 ```
-<repeticiones> x <ejercicio> rest <segundos> s
+<reps> x <exercise> rest <seconds> s
 ```
 
-### Valores permitidos
+### Allowed values
 
-| Categoría | Valores |
+| Category | Values |
 |---|---|
-| **Estilos** | `freestyle` `backstroke` `breaststroke` `butterfly` |
-| **Intensidades** | `easy` `moderate` `hard` |
-| **Equipamiento** | `fins` `paddles` `board` `pullbuoy` `snorkel` |
+| **Styles** | `freestyle` `backstroke` `breaststroke` `butterfly` |
+| **Intensities** | `easy` `moderate` `hard` |
+| **Equipment** | `fins` `paddles` `board` `pullbuoy` `snorkel` |
 | **Drill types** | `catchup` `onesided` `fingertip` `sixKick` `sculling` |
-| **Pace** | entero (segundos por 100m) |
-| **Rest** | entero (segundos) |
+| **Pace** | integer (seconds per 100m) |
+| **Rest** | integer (seconds) |
 
-### Ejemplo completo
+### Full example
 
 ```
-session semana1_martes {
+session week1_tuesday {
   warmup {
     swim 400 m freestyle easy pace 120
     2 x drill catchup 50 m easy rest 15 s
@@ -134,104 +126,95 @@ session semana1_martes {
 }
 ```
 
----
-
-## Arquitectura del sistema
+## System architecture
 
 ```
 SwimmingDslApp (Compose Desktop)
-│
-├── RascalService          ← parsea y analiza código DSL via Rascal jar
-│     ├── Modo REPL        ← proceso Java persistente (más rápido)
-│     └── Modo fallback    ← un proceso Java por llamada (más robusto)
-│
-├── LLMService             ← cliente HTTP hacia Gemini 2.5 Flash API
-│
-├── DSLTranslatorAgent     ← lenguaje natural → DSL válido (con reintentos)
-├── CoachAgent             ← chat conversacional con contexto de análisis
-└── OptimizerAgent         ← planes de entrenamiento multi-semana progresivos
+
+  RascalService          parses and analyzes DSL code through the Rascal jar
+                          spawns one Java process per call
+
+  LLMService              HTTP client for the Gemini 2.5 Flash API
+
+  DSLTranslatorAgent      natural language to valid DSL, with automatic retries
+  CoachAgent              conversational chat with live analysis context
+  OptimizerAgent          progressive multi-week training plans
 ```
 
-### Flujo de análisis (doAnalyze)
+### Analysis flow (doAnalyze)
 
-Cuando el usuario presiona "Analizar":
+When the user presses "Analyze":
 
 ```
-código DSL (string)
-      ↓
+DSL code (string)
+      down to
 RascalService.analyze()
-      ↓
-Runner.rsc analyze <código>    ← proceso Rascal
-      ↓
-WebAPI::analyzeToJSON()         ← gramática + regex en Rascal
-      ↓
-JSON con métricas:
+      down to
+Runner.rsc analyze <code>       Rascal process
+      down to
+WebAPI::analyzeToJSON()          grammar plus regex extraction in Rascal
+      down to
+JSON with metrics:
   { success, totalDistance, distanceKm, sessionCount,
     sessionNames, styles, intensities, equipment, drills,
     rest: { periods, totalSeconds, average },
     time: { swimSeconds, restSeconds, totalSeconds } }
-      ↓
-AnalysisResult (data class Kotlin)
-      ↓
-UI + historial persistido en ~/.swimmingdsl/history.json
+      down to
+AnalysisResult (Kotlin data class)
+      down to
+UI update, history persisted to ~/.swimmingdsl/history.json
 ```
 
----
+## The three AI agents
 
-## Los 3 agentes de IA
+### 1. DSLTranslatorAgent — natural language translator
 
-### 1. DSLTranslatorAgent — Traductor de lenguaje natural
+**Purpose:** turn a natural-language description into syntactically valid DSL code.
 
-**Propósito:** Convertir una descripción en lenguaje natural a código DSL sintácticamente válido.
-
-**Lógica (loop de validación con reintentos):**
+**Logic (validation loop with retries):**
 
 ```
 translate(userRequest):
   for attempt in 1..3:
-    1. LLM genera DSL (temperatura=0.2, determinista)
-    2. rascalService.analyze(dslCode)  ← valida con el parser real
-    3. ¿success? → retorna dslCode ✓
-       ¿error?   → añade al historial del chat:
-                   "Este código generó el error: <X>. Corrígelo."
-                   → reintenta con el contexto del error
-  si 3 intentos fallan → retorna error con último código generado
+    1. LLM generates DSL (temperature=0.2, low randomness)
+    2. rascalService.analyze(dslCode)   validates against the real parser
+    3. success?  return dslCode
+       error?     append to the chat history:
+                  "This code produced the error: <X>. Fix it."
+                  retry with the error as context
+  if all 3 attempts fail: return an error with the last generated code
 ```
 
-**Por qué funciona:** El LLM recibe su propio error de Rascal y puede auto-corregirse en la siguiente iteración. La temperatura baja (0.2) reduce la aleatoriedad para generar código estructurado preciso. El system prompt contiene la gramática completa con ejemplos válidos, y pide solo código crudo sin markdown.
+**Why it works:** the LLM receives its own Rascal error and can self-correct on the next iteration. The low temperature (0.2) reduces randomness to produce precise, structured code. The system prompt embeds the full grammar with valid examples and asks for raw code only, no markdown.
 
----
+### 2. CoachAgent — conversational personal coach
 
-### 2. CoachAgent — Entrenador personal conversacional
+**Purpose:** a chat interface with a coaching persona that has access to the current session's analysis.
 
-**Propósito:** Chat con un entrenador experto que tiene acceso al análisis de la sesión actual.
-
-**Lógica (chat con contexto dinámico):**
+**Logic (chat with dynamic context):**
 
 ```
 chat(userMessage, analysisResult, currentCode):
-  1. Construye systemPrompt dinámico:
-       BASE_PROMPT (rol, pautas por nivel: principiante/intermedio/avanzado)
-       + análisis actual de Rascal inyectado como texto:
-         distancia, estilos, intensidades, tiempos, descansos, equipamiento
-       + código DSL actual del editor
-  2. Añade userMessage a conversationHistory
+  1. Build a dynamic system prompt:
+       BASE_PROMPT (role, guidance by level: beginner/intermediate/advanced)
+       + the current Rascal analysis injected as text:
+         distance, styles, intensities, times, rest, equipment
+       + the current DSL code from the editor
+  2. Append userMessage to conversationHistory
   3. llmService.chat(systemPrompt, conversationHistory)
-  4. Añade respuesta al historial → mantiene contexto entre mensajes
-  5. Si error → removeLastOrNull() del historial → no corrompe la conversación
+  4. Append the response to history, preserving context across turns
+  5. On error: removeLastOrNull() from history so the conversation is not corrupted
 ```
 
-**Por qué funciona:** El análisis de Rascal se inyecta como contexto en cada llamada, dándole al LLM datos concretos (no inferidos) para dar feedback específico. El historial en memoria permite conversaciones multi-turno coherentes.
+**Why it works:** the Rascal analysis is injected as context on every call, giving the LLM concrete, non-inferred data to give specific feedback. The in-memory history keeps multi-turn conversations coherent.
 
-**Estado en memoria:** el historial vive mientras la app está abierta. Se limpia con `resetConversation()`.
+**State:** the history lives for as long as the app is open, and is cleared with `resetConversation()`.
 
----
+### 3. OptimizerAgent — multi-week training planner
 
-### 3. OptimizerAgent — Planificador de entrenamiento multi-semana
+**Purpose:** generate progressive plans of N weeks with M sessions per week, each validated and analyzed by Rascal.
 
-**Propósito:** Generar planes progresivos de N semanas con M sesiones por semana, validadas y analizadas por Rascal.
-
-**Lógica (generación progresiva con doble fallback):**
+**Logic (progressive generation with a two-tier fallback):**
 
 ```
 optimize(config, onProgress):
@@ -240,50 +223,48 @@ optimize(config, onProgress):
   for week in 1..weeks:
     for session in 1..sessionsPerWeek:
 
-      # Progresión automática: +7% de distancia por semana
-      progressionFactor = 1.0 + (week - 1) × 0.07
-      targetDistance = baseDistance × progressionFactor
+      # Automatic progression: +7% distance per week
+      progressionFactor = 1.0 + (week - 1) * 0.07
+      targetDistance = baseDistance * progressionFactor
 
-      # Prompt contextual con historial
-      prompt incluye:
+      # Contextual prompt with history
+      prompt includes:
         - goal, week/total, session/total
         - targetDistance, maxMinutes, styles
-        - distancia de la sesión anterior (para progresión coherente)
+        - previous session's distance, to keep progression coherent
 
-      # Intento principal: LLM genera DSL
+      # Primary attempt: LLM generates DSL
       dslCode = llmService.chat(SYSTEM_PROMPT, [prompt])
-      analysis = rascalService.analyze(dslCode)   ← rascalCallCount++
+      analysis = rascalService.analyze(dslCode)    rascalCallCount++
 
       if analysis.success:
         sessions.add(SessionPlan(week, sessionNum, dslCode, analysis))
       else:
-        # Fallback nivel 1: generador nativo de Rascal
+        # Fallback tier 1: Rascal's native generator
         fallback = rascalService.generate(goal, targetDistance, styles, maxMinutes)
         adjustedCode = adjustGeneratedDistance(fallback.code, targetDistance)
-        fallbackAnalysis = rascalService.analyze(adjustedCode)   ← rascalCallCount++
+        fallbackAnalysis = rascalService.analyze(adjustedCode)    rascalCallCount++
         if fallbackAnalysis.success: sessions.add(...)
 
-      # Protección de recursos
+      # Resource guard
       if rascalCallCount >= 10:
-        return OptimizationResult(success=true, sessions=parcial)
+        return OptimizationResult(success=true, sessions=partial)
 
-  return OptimizationResult(success=true, sessions=completo)
+  return OptimizationResult(success=true, sessions=complete)
 ```
 
-**Detalles clave:**
+**Key details:**
 
-- **+7% semanal:** `progressionFactor = 1.0 + (week-1) * 0.07`. Semana 1 = 100%, semana 4 = 121%, semana 8 = 149%.
-- **Contexto acumulativo:** el LLM recibe la distancia de la sesión anterior para mantener progresión coherente.
-- **`adjustGeneratedDistance`:** cuando Rascal genera código con distancias afectadas por división entera, este util recalcula la distancia real del DSL y ajusta el último `swim N m` para compensar la diferencia.
-- **Límite de 10 llamadas Rascal:** evita tiempos de espera excesivos en planes largos. Si se alcanza, se retorna el plan parcial generado hasta ese punto.
+- **+7% per week:** `progressionFactor = 1.0 + (week-1) * 0.07`. Week 1 = 100%, week 4 = 121%, week 8 = 149%.
+- **Cumulative context:** the LLM receives the previous session's distance to keep progression coherent.
+- **`adjustGeneratedDistance`:** when Rascal generates code whose distances are affected by integer division, this utility recomputes the real distance of the DSL and adjusts the last `swim N m` block to compensate for the difference.
+- **10-call limit:** avoids excessive wait times on long plans. If reached, the partial plan generated so far is returned.
 
----
-
-## Servicios base
+## Core services
 
 ### `LLMService`
 
-Cliente HTTP (Ktor + CIO engine) que comunica con Gemini 2.5 Flash.
+An HTTP client (Ktor with the CIO engine) that talks to Gemini 2.5 Flash.
 
 ```
 chat(systemPrompt, messages, temperature=0.7):
@@ -293,438 +274,99 @@ chat(systemPrompt, messages, temperature=0.7):
     systemInstruction: { parts: [{ text: systemPrompt }] }
     contents: [ { role: "user"|"model", parts: [{ text }] }, ... ]
     generationConfig: { maxOutputTokens: 8192, temperature }
-  → retorna text del primer candidate
+  returns the text of the first candidate
 ```
 
-- API key desde `GEMINI_API_KEY` (variable de entorno)
-- Timeout: 60 segundos
-- Si `finishReason == "MAX_TOKENS"`: log de advertencia (respuesta truncada)
-- Si la respuesta contiene clave `"error"`: lanza excepción con el mensaje de la API
+- API key read from `GEMINI_API_KEY` (environment variable)
+- Timeout: 60 seconds
+- If `finishReason == "MAX_TOKENS"`: logs a warning (truncated response)
+- If the response contains an `"error"` key: throws with the API's own message
 
 ### `RascalService`
 
-Gestiona la ejecución del parser Rascal. Tiene dos modos con fallback automático.
-
-**Modo REPL (persistente):**
-
-```
-initRepl():
-  1. Arranca: java -Drascal.projectPath=<src/> -jar rascal-shell-stable.jar
-  2. Envía: import WebAPI;   ← compila módulos una vez
-  3. Prueba: println("__RASCAL_START__"); println("ok"); println("__RASCAL_END__");
-  4. ¿Responde en 15s? → REPL listo
-     ¿No responde?    → fallback mode
-
-executeViaRepl(expression):
-  escribe: println("__RASCAL_START__"); println(<expression>); println("__RASCAL_END__");
-  lee líneas entre START y END markers
-  timeout: 30s
-```
-
-**Modo fallback (process-per-call):**
+Manages execution of the Rascal parser. Each call spawns a dedicated Java process.
 
 ```
 executeRascalProcess(command, args):
   java -jar rascal-shell-stable.jar Runner.rsc <command> <args...>
   timeout: 30s
-  ~5-6 segundos por llamada
+  roughly 5-6 seconds per call (JVM startup plus interpretation)
 ```
 
-**Extracción de JSON:** `extractJson()` escanea el stdout en busca del objeto JSON válido que contenga la clave `"success"`. Ignora cualquier output extra de progreso de Rascal.
+**JSON extraction:** `extractJson()` scans stdout for the valid JSON object that contains a `"success"` key, ignoring any extra progress output printed by Rascal.
 
-**Escapado:** `escapeForRascal()` escapa `\`, `"`, `\n`, `\r`, `\t`, `<` y `>` antes de embeber el código DSL en una expresión Rascal (los `<>` son interpolación en strings de Rascal).
+**Escaping:** `escapeForRascal()` escapes `\`, `"`, `\n`, `\r`, `\t`, `<`, and `>` before embedding the DSL code inside a Rascal expression (`<>` is string interpolation syntax in Rascal).
 
----
-
-## Estructura del proyecto
+## Project structure
 
 ```
 swimmingdsl/
-│
-├── rascal-shell-stable.jar         ← Rascal runtime (v0.40.17)
-│
-├── src/                            ← Módulos Rascal del DSL
-│   ├── Lexer.rsc                   ← tokens: INT, ID, Keywords, layout WS
-│   ├── SwimSyntax.rsc              ← gramática completa del DSL
-│   ├── AST.rsc                     ← tipos de datos: Program, Session, Block, Exercise...
-│   ├── Semantics.rsc               ← lógica: cálculo de distancias, tiempos, generadores
-│   ├── WebAPI.rsc                  ← analyzeToJSON + generateToJSON (interfaz principal)
-│   └── Runner.rsc                  ← entry point CLI (invocado por process-per-call)
-│
-└── kotlin-app/
-    └── src/main/kotlin/swimming/
-        ├── Main.kt                 ← entry point, SwimmingDslApp, AppTab enum
-        ├── agent/
-        │   ├── DSLTranslatorAgent.kt   ← NL→DSL con reintentos automáticos
-        │   ├── CoachAgent.kt           ← chat conversacional con contexto
-        │   └── OptimizerAgent.kt       ← planes multi-semana progresivos
-        ├── service/
-        │   ├── LLMService.kt           ← cliente Gemini API
-        │   └── RascalService.kt        ← interfaz Rascal (REPL + fallback)
-        ├── model/
-        │   ├── AnalysisResult.kt       ← AnalysisResult, GenerateResult, TimeInfo, RestInfo
-        │   └── UserProfile.kt          ← nivel, estilos preferidos, minutos disponibles
-        ├── util/
-        │   └── DslDistanceAdjuster.kt  ← ajusta distancias en DSL generado por Rascal
-        └── ui/
-            ├── DashboardPanel.kt       ← historial y estadísticas globales
-            ├── EditorPanel.kt          ← editor de código DSL
-            ├── TranslatorPanel.kt      ← UI del DSLTranslatorAgent
-            ├── CoachPanel.kt           ← UI del CoachAgent (chat)
-            ├── OptimizerPanel.kt       ← UI del OptimizerAgent
-            ├── AnalysisPanel.kt        ← panel de métricas de Rascal (sidebar derecho)
-            ├── OnboardingScreen.kt     ← pantalla inicial de configuración de perfil
-            └── SidebarNav.kt           ← navegación lateral
+
+  rascal-shell-stable.jar          Rascal runtime (v0.40.17)
+
+  src/                             Rascal modules for the DSL
+    Lexer.rsc                      tokens: INT, ID, keywords, whitespace layout
+    SwimSyntax.rsc                 the full DSL grammar
+    AST.rsc                        data types: Program, Session, Block, Exercise...
+    Semantics.rsc                  distance/time calculations, session generators
+    WebAPI.rsc                     analyzeToJSON + generateToJSON (main interface)
+    Runner.rsc                     CLI entry point (invoked per call)
+
+  kotlin-app/
+    src/main/kotlin/swimming/
+      Main.kt                      entry point, SwimmingDslApp, AppTab enum
+      agent/
+        DSLTranslatorAgent.kt      NL to DSL with automatic retries
+        CoachAgent.kt              conversational chat with context
+        OptimizerAgent.kt          progressive multi-week plans
+      service/
+        LLMService.kt              Gemini API client
+        RascalService.kt           Rascal interface (process per call)
+      model/
+        AnalysisResult.kt          AnalysisResult, GenerateResult, TimeInfo, RestInfo
+        UserProfile.kt             level, preferred styles, available minutes
+      util/
+        DslDistanceAdjuster.kt     adjusts distances in Rascal-generated DSL
+      ui/
+        DashboardPanel.kt          history and overall statistics
+        EditorPanel.kt             DSL code editor
+        TranslatorPanel.kt         UI for DSLTranslatorAgent
+        CoachPanel.kt              UI for CoachAgent (chat)
+        OptimizerPanel.kt          UI for OptimizerAgent
+        AnalysisPanel.kt           Rascal metrics panel (right sidebar)
+        OnboardingScreen.kt        initial profile setup screen
+        SidebarNav.kt              side navigation
 ```
 
----
+## App screens
 
-## Pantallas de la app
-
-| Pantalla | Agente/Servicio | Descripción |
+| Screen | Agent / service | Description |
 |---|---|---|
-| **Dashboard** | — | Historial de sesiones, estadísticas globales, perfil |
-| **Editor** | RascalService | Editor DSL con análisis manual |
-| **Traductor IA** | DSLTranslatorAgent | Descripción en lenguaje natural → DSL válido |
-| **Coach IA** | CoachAgent | Chat con entrenador que conoce la sesión actual |
-| **Optimizador IA** | OptimizerAgent | Genera plan completo multi-semana |
+| **Dashboard** | none | Session history, overall statistics, profile |
+| **Editor** | RascalService | DSL editor with manual analysis |
+| **AI Translator** | DSLTranslatorAgent | Natural-language description to valid DSL |
+| **AI Coach** | CoachAgent | Chat with a coach that knows the current session |
+| **AI Optimizer** | OptimizerAgent | Generates a full multi-week plan |
 
-En todas las pestañas excepto Dashboard, el panel de análisis de Rascal se muestra a la derecha mostrando distancia, estilos, intensidades, tiempos y descansos de la sesión actual.
+On every tab except Dashboard, the Rascal analysis panel is shown on the right, displaying distance, styles, intensities, times, and rest for the current session.
 
----
-
-## Datos persistidos
+## Persisted data
 
 ```
 ~/.swimmingdsl/
-  ├── profile.json    ← perfil del usuario (nivel, estilos preferidos, minutos disponibles)
-  └── history.json    ← lista de AnalysisResult de sesiones analizadas exitosamente
+  profile.json     user profile (level, preferred styles, available minutes)
+  history.json     list of AnalysisResult entries for successfully analyzed sessions
 ```
 
-El perfil se crea en el onboarding inicial. Si el archivo no existe al iniciar, se muestra la pantalla de bienvenida para configurarlo.
+The profile is created during initial onboarding. If the file does not exist on startup, the welcome screen is shown to configure it.
 
-Un DSL (Domain-Specific Language) para programar y analizar sesiones de entrenamiento de natación, construido con Rascal MPL.
+## Roadmap
 
-## Características
-
-### 1. **Sintaxis Básica**
-```swim
-session morning {
-  swim 400 m freestyle easy pace 120
-  8 x swim 100 m freestyle hard pace 75 rest 15 s
-  kick 100 m easy
-}
-```
-
-### 2. **Estructura con Secciones**
-Organiza tus sesiones en warmup, main y cooldown:
-
-```swim
-session advanced {
-  warmup {
-    swim 400 m freestyle easy pace 120
-    swim 200 m backstroke easy pace 130
-  }
-  
-  main {
-    8 x swim 100 m freestyle hard pace 75 rest 15 s
-    4 x swim 200 m backstroke moderate pace 110 rest 30 s
-  }
-  
-  cooldown {
-    swim 200 m easy pace 140
-    kick 100 m easy
-  }
-}
-```
-
-### 3. **Estilos de Nado**
-- `freestyle` - Crol/estilo libre
-- `backstroke` - Espalda
-- `breaststroke` - Pecho/braza
-- `butterfly` - Mariposa
-
-### 4. **Niveles de Intensidad**
-- `easy` - Fácil / recuperación
-- `moderate` - Moderado
-- `hard` - Difícil / intenso
-
-### 5. **Equipamiento**
-```swim
-session withEquipment {
-  swim 300 m easy pace 120 with fins
-  swim 200 m freestyle moderate with paddles
-  kick 100 m hard with board
-  swim 150 m easy with pullbuoy
-  swim 200 m easy with snorkel
-}
-```
-
-Equipamiento disponible:
-- `fins` - Aletas
-- `paddles` - Palas/manoplas
-- `board` - Tabla
-- `pullbuoy` - Pull buoy
-- `snorkel` - Snorkel frontal
-
-### 6. **Ejercicios de Técnica (Drills)**
-```swim
-session techniqueWork {
-  drill catchup 200 m easy
-  drill fingertip 200 m easy
-  4 x drill sculling 50 m easy rest 20 s
-  drill onesided 200 m moderate
-}
-```
-
-Drills disponibles:
-- `catchup` - Catch-up
-- `onesided` - Un solo brazo
-- `fingertip` - Punta de dedos
-- `6kick` - 6 patadas
-- `sculling` - Sculling/remadas
-
-### 7. **Metas de Tiempo (Targets)**
-```swim
-session withTargets {
-  swim 100 m freestyle hard pace 70 target 1:10
-  4 x swim 50 m butterfly hard pace 50 target 0:40 rest 30 s
-  swim 200 m backstroke moderate pace 100 target 2:00
-}
-```
-
-### 8. **Generador Automático de Sesiones** 
-```swim
-generate session {
-  goal: endurance
-  distance: 3000
-  styles: [freestyle, backstroke]
-  duration: 60 minutes
-}
-```
-
-Tipos de objetivos (goals):
-- `endurance` - Resistencia aeróbica (series largas, pace moderado)
-- `speed` - Velocidad (series cortas, pace rápido)
-- `technique` - Técnica (énfasis en drills)
-- `recovery` - Recuperación (nado fácil continuo)
-
-## Análisis Automático
-
-El DSL proporciona análisis detallado de tus sesiones:
-
-```
-═══════════════════════════════════════════════════════
-  SWIMMING DSL - Session Analysis
-  File: simple_advanced.swim
-═══════════════════════════════════════════════════════
-
-PARSING...
-✓ Parse successful!
-
-BASIC ANALYSIS:
-───────────────────────────────────────────────────────
-Total sessions: 1
-Session names: morning
-
-DISTANCE CALCULATION:
-───────────────────────────────────────────────────────
-Total distance: 1700 meters (1.7 km)
-
-STROKE ANALYSIS:
-───────────────────────────────────────────────────────
-  • freestyle: 3 set(s)
-  • backstroke: 1 set(s)
-
-INTENSITY ANALYSIS:
-───────────────────────────────────────────────────────
-  • easy: 3 set(s)
-  • moderate: 1 set(s)
-  • hard: 3 set(s)
-
-REST ANALYSIS:
-───────────────────────────────────────────────────────
-  Total rest periods: 1
-  Total rest time: 105 seconds (1:45)
-  Average rest: 15 seconds
-
-TIME ESTIMATION:
-───────────────────────────────────────────────────────
-  Estimated swim time: 25:30
-  Rest time: 1:45
-  Total session time: 27:15
-
-═══════════════════════════════════════════════════════
-✓ Analysis complete!
-═══════════════════════════════════════════════════════
-```
-
-## Cómo Usar
-
-### Requisitos
-- Java 11+
-- Rascal MPL (incluido en `rascal.jar`)
-
-### Instalación
-1. Clona este repositorio
-2. Asegúrate de tener `rascal.jar` en el directorio principal
-
-### Ejecutar
-```bash
-java -jar rascal.jar
-```
-
-En el REPL de Rascal:
-```rascal
-rascal> import Main;
-rascal> main();
-```
-
-### Analizar un archivo específico
-Edita `Main.rsc` y cambia el archivo a analizar:
-```rascal
-void main() {
-  analyzeFile(|project://swimmingdsl/tu_archivo.swim|);
-}
-```
-
-### Generar una sesión
-En el REPL de Rascal:
-```rascal
-rascal> import Semantics;
-rascal> import AST;
-rascal> import IO;
-
-// Generar sesión de resistencia
-rascal> Session s = generateSession(generatorConfig(
-           endurance(),
-           3000,
-           [freestyle(), backstroke()],
-           60
-        ));
-rascal> println(s);
-
-// Generar sesión de velocidad
-rascal> Session s = generateSession(generatorConfig(
-           speed(),
-           2000,
-           [freestyle()],
-           45
-        ));
-rascal> println(s);
-```
-
-## Estructura del Proyecto
-
-```
-swimmingdsl/
-├── src/
-│   ├── Lexer.rsc          # Tokens y keywords
-│   ├── SwimSyntax.rsc     # Gramática del DSL
-│   ├── AST.rsc            # Árbol de sintaxis abstracta
-│   ├── Semantics.rsc      # Análisis semántico y generador
-│   ├── Main.rsc           # Punto de entrada y análisis
-│   ├── TypeChecker.rsc    # (futuro) Validaciones
-│   └── Visitors.rsc       # (futuro) Visitadores del AST
-├── example.swim           # Ejemplo básico
-├── simple_advanced.swim   # Ejemplo con todas las features
-├── advanced.swim          # Ejemplo con secciones
-├── generator.swim         # Ejemplo de generador
-├── file.swim             # Archivo de prueba original
-├── rascal.jar            # Rascal MPL runtime
-├── pom.xml               # Configuración Maven
-└── README.md             # Este archivo
-```
-
-## Ejemplos
-
-### Ejemplo 1: Sesión de Resistencia
-```swim
-session endurance {
-  warmup {
-    swim 800 m freestyle easy pace 110
-  }
-  
-  main {
-    8 x swim 400 m freestyle moderate pace 100 rest 45 s
-  }
-  
-  cooldown {
-    swim 400 m easy pace 120
-  }
-}
-```
-
-### Ejemplo 2: Sesión de Velocidad
-```swim
-session speed {
-  warmup {
-    swim 400 m easy pace 120
-    4 x swim 50 m hard pace 50 rest 30 s
-  }
-  
-  main {
-    16 x swim 25 m butterfly hard pace 30 rest 20 s
-    8 x swim 50 m freestyle hard pace 45 rest 30 s
-  }
-  
-  cooldown {
-    swim 200 m easy pace 130
-  }
-}
-```
-
-### Ejemplo 3: Sesión de Técnica
-```swim
-session technique {
-  warmup {
-    swim 600 m easy pace 120
-  }
-  
-  main {
-    drill catchup 300 m easy
-    drill fingertip 300 m easy
-    drill onesided 300 m moderate
-    4 x drill sculling 50 m easy rest 20 s
-  }
-  
-  cooldown {
-    swim 200 m easy with snorkel
-  }
-}
-```
-
-### Ejemplo 4: Sesión Mixta con Equipamiento
-```swim
-session mixed {
-  warmup {
-    swim 400 m easy pace 120 with fins
-  }
-  
-  main {
-    swim 300 m freestyle moderate with paddles
-    kick 200 m hard with board
-    swim 200 m easy with pullbuoy
-    4 x swim 100 m freestyle hard pace 75 rest 20 s
-  }
-  
-  cooldown {
-    swim 200 m easy with snorkel
-  }
-}
-```
-
-## Características Futuras
-
-- [ ] Exportación a JSON/CSV
-- [ ] Visualización de gráficas
-- [ ] Cálculo de calorías quemadas
-- [ ] Training Stress Score 
-- [ ] Validaciones avanzadas (warnings)
-- [ ] Comparación de sesiones
-- [ ] Exportación a formatos de dispositivos (TCX/FIT)
-- [ ] Historial de entrenamientos
-
-
-
----
+- Export to JSON/CSV
+- Chart visualizations
+- Calorie estimation
+- Training Stress Score
+- Advanced validation (warnings, not just hard errors)
+- Session comparison
+- Export to device formats (TCX/FIT)
+- Long-term training history

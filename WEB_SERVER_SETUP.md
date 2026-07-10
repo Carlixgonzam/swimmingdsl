@@ -1,101 +1,102 @@
-# Swimming DSL - Web Server Setup
+# Swimming DSL — Web Server Setup
 
-este documento describe como ejecutar el servidor web que conecta el frontend con el backend de Rascal
+This document describes how to run the web server that connects the frontend to the Rascal backend.
 
-## Arquitectura
+## Architecture
 
 ```
 Browser (HTML/JS)
-    ↓ HTTP/JSON
+    down to  HTTP/JSON
 Node.js Server (Express)
-    ↓ exec shell
+    down to  exec shell
 Rascal (Java)
-    ↓ parse/analyze
+    down to  parse/analyze
 Swimming DSL (.swim files)
 ```
 
-el sistema tiene 3 componentes principales:
+The system has three main components:
 
-1. **frontend Web** (`web/index-server.html`) - Interfaz de usuario en el navegador
-2. **node.js Server** (`server/server.js`) - API REST que actúa como puente
-3. **rascal Backend** (`src/WebAPI.rsc`) - Motor de análisis escrito en Rascal
+1. **Web frontend** (`web/index-server.html`) — the user interface in the browser
+2. **Node.js server** (`server/server.js`) — the REST API acting as a bridge
+3. **Rascal backend** (`src/WebAPI.rsc`) — the analysis engine, written in Rascal
 
-## Requisitos Previos
+## Prerequisites
 
-- **Node.js** 14+ y npm
+- **Node.js** 14+ and npm
 - **Java** 11+
-- **Rascal JAR** (debe existir como `rascal.jar` en el directorio principal)
+- **Rascal runtime** (`rascal-shell-stable.jar`, at the root of the project)
 
-## Instalación
+## Installation
 
-### 1. verificar que eestá rascal.jar
+### 1. Check for the Rascal runtime
 
-El proyecto necesita `rascal.jar` en el directorio raíz. Si no lo tienes, descárgalo o usa el que ya tenías.
+The project needs `rascal-shell-stable.jar` at its root. It is already included; if it is missing for any reason, see the troubleshooting section below.
 
-### 2. Instalar dependencias de Node.js
+### 2. Install the Node.js dependencies
 
 ```bash
 cd server
 npm install
 ```
 
-Esto instalará:
-- `express` - framwork web
-- `cors` - pard permitir peticiones
+This installs:
+- `express` — web framework
+- `cors` — allows cross-origin requests
 
-## Uso
+## Usage
 
-### iniciar el servidor
+### Start the server
 
-Desde el directorio `server/`:
+From the `server/` directory:
 
 ```bash
 npm start
 ```
 
-
-se debería ver:
+You should see something like:
 
 ```
-🏊‍♀️ Swimming DSL Server running on http://localhost:3000
-📂 Project path: /Users/carlagonzalez/Desktop/swimmingdsl
-☕ Rascal JAR: /Users/carlagonzalez/Desktop/swimmingdsl/rascal.jar
+Swimming DSL Server running on http://localhost:3000
 
-API Endpoints:
-  GET  /api/health - Health check
-  POST /api/analyze - Analyze DSL code
-  POST /api/generate - Generate session
+Endpoints:
+  POST /api/analyze    - Analyze DSL (Rascal)
+  POST /api/generate   - Generate session (Rascal)
+  POST /api/translate  - NL to DSL (AI + Rascal loop)
+  POST /api/coach      - Coaching feedback (AI)
+  POST /api/optimize   - Optimize session (AI + Rascal)
+
+GEMINI_API_KEY: set
 ```
 
-### abrir la interfaz web
+### Open the web interface
 
-1. el servidor ya está sirviendo el frontend
-2. abror tu navegador en: **http://localhost:3000**
-3. verás la interfaz web del Swimming DSL
+1. The server is already serving the frontend.
+2. Open your browser at **http://localhost:3000**.
+3. You will see the Swimming DSL web interface.
 
-## Uso de la Interfaz
+## Using the interface
 
-### analizar Código
+### Analyzing code
 
-1. Escribe código Swimming DSL en el editor o carga un ejemplo
-2. presiona "Analizar"
-3. el frontend envía el código al servidor Node.js
-4. el servidor ejecuta Rascal con tu código
-5. los resultados se muestran en el panel de Análisis
+1. Write Swimming DSL code in the editor, or load an example.
+2. Press "Analyze".
+3. The frontend sends the code to the Node.js server.
+4. The server runs Rascal against that code.
+5. Results are shown in the Analysis panel.
 
-### generar Sesión
+### Generating a session
 
-1. Ve a la pestaña "Generador"
-2. Configura los parámetros (objetivo, distancia, estilos, duración)
-3. Presiona "Generar Sesión"
-4. Rascal genera el código DSL
-5. El código aparece en el editor y se analiza automáticamente
+1. Go to the "Generator" tab.
+2. Set the parameters (goal, distance, styles, duration).
+3. Press "Generate Session".
+4. Rascal generates the DSL code.
+5. The code appears in the editor and is analyzed automatically.
 
-## API Endpoints
+## API endpoints
 
 ### GET /api/health
 
-Health check del servidor.
+Server health check.
 
 **Response:**
 ```json
@@ -107,7 +108,7 @@ Health check del servidor.
 
 ### POST /api/analyze
 
-Analiza código Swimming DSL.
+Analyzes Swimming DSL code.
 
 **Request:**
 ```json
@@ -147,7 +148,7 @@ Analiza código Swimming DSL.
 
 ### POST /api/generate
 
-Genera una sesión basada en parámetros.
+Generates a session from a set of parameters.
 
 **Request:**
 ```json
@@ -173,105 +174,96 @@ Genera una sesión basada en parámetros.
 
 ### Error: "Cannot find module 'express'"
 
-Ejecuta `npm install` en el directorio `server/`.
+Run `npm install` inside `server/`.
 
 ### Error: "Rascal execution failed"
 
-Verifica que:
-1. `rascal.jar` existe en el directorio raíz
-2. Java está instalado: `java -version`
-3. El módulo `WebAPI.rsc` está en `src/`
+Check that:
+1. `rascal-shell-stable.jar` exists at the root of the project.
+2. Java is installed: `java -version`.
+3. The `WebAPI.rsc` module is present in `src/`.
 
 ### Error: "No JSON output from Rascal"
 
-Esto puede ocurrir si Rascal tiene un error de sintaxis. Revisa los logs del servidor (en la terminal donde ejecutaste `npm start`) para ver el output completo de Rascal.
+This usually means Rascal hit a syntax error. Check the server logs (in the terminal where you ran `npm start`) to see the full Rascal output.
 
-### El servidor no arranca en el puerto 3000
+### The server does not start on port 3000
 
-Si el puerto 3000 está ocupado, puedes usar otro:
+If port 3000 is already in use, use a different one:
 
 ```bash
 PORT=8080 npm start
 ```
 
-Luego abre `http://localhost:8080`
+Then open `http://localhost:8080`.
 
-## Desarrollo
+## Development
 
-### Modo desarrollo con auto-reload
+### Auto-reload during development
 
 ```bash
 npm run dev
 ```
 
-Esto usa `nodemon` para reiniciar el servidor automáticamente cuando cambies código.
+This uses `nodemon` to restart the server automatically whenever the code changes.
 
-### Modificar el puerto
+### Changing the port
 
-Edita `server/server.js`:
+Edit `server/server.js`:
 
 ```javascript
-const PORT = process.env.PORT || 3000;  // cambia 3000 por otro puerto
+const PORT = process.env.PORT || 3000;  // change 3000 to another port
 ```
 
-O usa una variable de entorno:
+Or use an environment variable:
 
 ```bash
 PORT=8080 npm start
 ```
 
-### Agregar más endpoints
+### Adding new endpoints
 
-Edita `server/server.js` y agrega rutas adicionales:
+Edit `server/server.js` and add additional routes:
 
 ```javascript
-app.post('/api/mi-nuevo-endpoint', async (req, res) => {
-  // Tu código aquí
+app.post('/api/my-new-endpoint', async (req, res) => {
+  // your code here
 });
 ```
 
-## Testing con curl
-
-Puedes probar los endpoints con curl:
+## Testing with curl
 
 ```bash
 # Health check
 curl http://localhost:3000/api/health
 
-# Analizar código
+# Analyze code
 curl -X POST http://localhost:3000/api/analyze \
   -H "Content-Type: application/json" \
   -d '{"code":"session test {\n  swim 100 m easy\n}"}'
 
-# Generar sesión
+# Generate a session
 curl -X POST http://localhost:3000/api/generate \
   -H "Content-Type: application/json" \
   -d '{"goal":"endurance","distance":2000,"styles":["freestyle"],"duration":45}'
 ```
 
-## Estructura de Archivos
+## File structure
 
 ```
 swimmingdsl/
-├── src/
-│   ├── WebAPI.rsc          # Módulo Rascal con funciones de análisis y JSON
-│   ├── AST.rsc             # Definiciones del AST
-│   ├── SwimSyntax.rsc      # Gramática del DSL
-│   ├── Semantics.rsc       # Análisis semántico
-│   └── ...
-├── server/
-│   ├── server.js           # Servidor Node.js Express
-│   ├── package.json        # Dependencias npm
-│   └── node_modules/       # (generado por npm install)
-├── web/
-│   ├── index.html          # Frontend standalone (sin servidor)
-│   ├── index-server.html   # Frontend que usa el servidor
-│   ├── parser.js           # Parser JavaScript standalone
-│   └── analyzer.js         # Analyzer JavaScript standalone
-├── rascal.jar              # Rascal MPL runtime
-└── WEB_SERVER_SETUP.md     # Este archivo
+  src/
+    WebAPI.rsc            Rascal module with analysis and JSON functions
+    AST.rsc                AST definitions
+    SwimSyntax.rsc         DSL grammar
+    Semantics.rsc           semantic analysis
+    ...
+  server/
+    server.js              Node.js Express server
+    package.json            npm dependencies
+    node_modules/           generated by npm install
+  web/
+    index-server.html      frontend served by the Node.js server
+  rascal-shell-stable.jar  Rascal MPL runtime
+  WEB_SERVER_SETUP.md      this file
 ```
-
-
-
-
