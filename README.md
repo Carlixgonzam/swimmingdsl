@@ -1,4 +1,4 @@
-# Swimming DSL — Desktop App
+# Swimming DSL 
 
 Desktop application for designing, analyzing, and optimizing swimming training sessions using a purpose-built domain-specific language, parsed by Rascal and backed by three AI agents running on Gemini 2.5 Flash.
 
